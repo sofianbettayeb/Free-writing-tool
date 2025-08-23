@@ -139,7 +139,9 @@
   left: auto !important;
   top: auto !important;
   overflow: visible;
-  contain: layout style;
+  contain: layout style size;
+  height: auto !important;
+  box-sizing: border-box;
 }
 
 /* Custom scrollbar styling */

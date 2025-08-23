@@ -311,11 +311,11 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
         
         {/* Scrollable Content Area */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-8 py-6">
-          <div className="w-full">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 md:px-8 py-6">
+          <div className="w-full h-full overflow-hidden">
             <EditorContent
               editor={editor}
-              className="editor-contained"
+              className="w-full h-auto overflow-hidden"
               style={{
                 fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
               }}
