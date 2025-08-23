@@ -7,7 +7,7 @@ import {
   journalEntries 
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, ilike } from "drizzle-orm";
+import { eq, desc, or, ilike, and } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
         ...updateData,
         updatedAt: new Date(),
       })
-      .where(eq(journalEntries.id, id) && eq(journalEntries.userId, userId))
+      .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)))
       .returning();
     return updated;
   }
@@ -93,7 +93,7 @@ export class DatabaseStorage implements IStorage {
   async deleteJournalEntry(id: string, userId: string): Promise<boolean> {
     const result = await db
       .delete(journalEntries)
-      .where(eq(journalEntries.id, id) && eq(journalEntries.userId, userId));
+      .where(and(eq(journalEntries.id, id), eq(journalEntries.userId, userId)));
     return (result.rowCount ?? 0) > 0;
   }
 
@@ -102,10 +102,12 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(journalEntries)
       .where(
-        eq(journalEntries.userId, userId) &&
-        or(
-          ilike(journalEntries.title, `%${query}%`),
-          ilike(journalEntries.content, `%${query}%`)
+        and(
+          eq(journalEntries.userId, userId),
+          or(
+            ilike(journalEntries.title, `%${query}%`),
+            ilike(journalEntries.content, `%${query}%`)
+          )
         )
       )
       .orderBy(desc(journalEntries.createdAt));
