@@ -297,29 +297,25 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       </div>
 
       {/* Editor Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-8 py-6 border-b border-gray-100">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="max-w-4xl mx-auto px-8 py-12">
           <input
             type="text"
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
             placeholder="Entry title..."
-            className="w-full text-3xl font-bold border-none outline-none placeholder-gray-400/80 text-gray-900 leading-tight focus-ring"
+            className="w-full text-3xl font-bold border-none outline-none mb-8 placeholder-gray-400/80 text-gray-900 leading-tight focus-ring"
             data-testid="input-title"
           />
-        </div>
-        
-        <div className="flex-1 overflow-y-auto px-8 py-6">
-          <div className="max-w-4xl mx-auto">
-            <EditorContent
-              editor={editor}
-              className="prose-editor"
-              style={{
-                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
-              }}
-              data-testid="editor-content"
-            />
-          </div>
+          
+          <EditorContent
+            editor={editor}
+            className="w-full min-h-[500px]"
+            style={{
+              fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
+            }}
+            data-testid="editor-content"
+          />
         </div>
       </div>
 
