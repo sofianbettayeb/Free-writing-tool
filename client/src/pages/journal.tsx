@@ -114,6 +114,22 @@ export default function Journal() {
   };
 
   const handleSelectEntry = (entry: JournalEntry) => {
+    // Auto-save current entry before switching
+    if (currentEntry.title?.trim() || currentEntry.content?.trim()) {
+      const entryData: InsertJournalEntry = {
+        title: currentEntry.title || "Untitled",
+        content: currentEntry.content || "",
+        wordCount: currentEntry.wordCount || "0",
+      };
+
+      if (selectedEntryId) {
+        updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
+      } else {
+        createEntryMutation.mutate(entryData);
+      }
+    }
+
+    // Switch to selected entry
     setSelectedEntryId(entry.id);
     setCurrentEntry({
       title: entry.title,
@@ -122,17 +138,26 @@ export default function Journal() {
     });
   };
 
-  // Auto-save functionality
+  // Auto-save functionality - save to server after typing stops
   useEffect(() => {
     const autoSave = setTimeout(() => {
-      if (currentEntry.content && currentEntry.content.trim().length > 0) {
-        // Auto-save to localStorage only
-        // Don't save empty entries to the server
+      if (currentEntry.title?.trim() || currentEntry.content?.trim()) {
+        const entryData: InsertJournalEntry = {
+          title: currentEntry.title || "Untitled",
+          content: currentEntry.content || "",
+          wordCount: currentEntry.wordCount || "0",
+        };
+
+        if (selectedEntryId) {
+          updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
+        } else {
+          createEntryMutation.mutate(entryData);
+        }
       }
-    }, 2000);
+    }, 2000); // Auto-save after 2 seconds of no changes
 
     return () => clearTimeout(autoSave);
-  }, [currentEntry]);
+  }, [currentEntry, selectedEntryId, createEntryMutation, updateEntryMutation]);
 
   const displayedEntries = searchQuery ? searchResults : entries;
 
@@ -190,15 +215,16 @@ export default function Journal() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
               </button>
-
-              <button
-                onClick={handleSaveEntry}
-                disabled={createEntryMutation.isPending || updateEntryMutation.isPending}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm font-medium"
-                data-testid="button-save"
-              >
-                {createEntryMutation.isPending || updateEntryMutation.isPending ? 'Saving...' : 'Save'}
-              </button>
+              
+              {(createEntryMutation.isPending || updateEntryMutation.isPending) && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </div>
+              )}
             </div>
           </div>
         </div>
