@@ -204,7 +204,7 @@ export default function Journal() {
   const displayedEntries = searchQuery ? searchResults : entries;
 
   return (
-    <div className="grid grid-rows-[64px_1fr_44px] h-[100dvh] overflow-hidden bg-gray-50/30" data-testid="journal-app">
+    <div className="fixed inset-0 grid grid-rows-[56px_1fr_44px] bg-gray-50/30" data-testid="journal-app">
       {/* Header Row */}
       <div className="border-b border-gray-200/60 px-4 md:px-8 py-5 bg-white/80 backdrop-blur-sm flex items-center justify-between">
             <div className="flex items-center space-x-6">
