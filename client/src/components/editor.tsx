@@ -139,6 +139,10 @@ export function Editor({ entry, onUpdate }: EditorProps) {
     editor?.chain().focus().toggleBulletList().run();
   }, [editor]);
 
+  const toggleOrderedList = useCallback(() => {
+    editor?.chain().focus().toggleOrderedList().run();
+  }, [editor]);
+
   const insertLink = useCallback(() => {
     const url = window.prompt('Enter URL:');
     if (url) {
@@ -227,7 +231,24 @@ export function Editor({ entry, onUpdate }: EditorProps) {
               data-testid="button-bullet-list"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+              </svg>
+            </button>
+
+            <button
+              onClick={toggleOrderedList}
+              className={`p-2 hover:bg-gray-100 rounded transition-colors ${
+                editor.isActive('orderedList') ? 'bg-gray-200' : ''
+              }`}
+              title="Numbered List"
+              data-testid="button-ordered-list"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                <circle cx="2" cy="6" r="1" fill="currentColor"></circle>
+                <circle cx="2" cy="10" r="1" fill="currentColor"></circle>
+                <circle cx="2" cy="14" r="1" fill="currentColor"></circle>
+                <circle cx="2" cy="18" r="1" fill="currentColor"></circle>
               </svg>
             </button>
 
