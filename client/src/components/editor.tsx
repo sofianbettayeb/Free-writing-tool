@@ -312,7 +312,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar px-4 md:px-8 py-6">
-          <div className="w-full max-w-none md:max-w-4xl md:mx-auto">
+          <div className="w-full">
             <EditorContent
               editor={editor}
               className="editor-contained"
