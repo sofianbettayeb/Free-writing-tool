@@ -34,7 +34,6 @@ export async function uploadImage(file: File): Promise<string> {
     
     return imagePath;
   } catch (error) {
-    console.error('Image upload failed:', error);
     throw error;
   }
 }

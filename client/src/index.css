@@ -9,9 +9,6 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* Console debug check for scrollable elements */
-/* Open console and run: document.querySelectorAll('[style*="overflow"], [class*="overflow"]').forEach(el => console.log(el, getComputedStyle(el).overflow)) */
-
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(210, 25%, 7.8431%);

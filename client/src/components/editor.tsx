@@ -73,7 +73,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
                   view.dispatch(transaction);
                 }
               } catch (error) {
-                console.error('Failed to upload image:', error);
+                // Handle upload error silently in production
               }
             });
           }
@@ -96,7 +96,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
               const imageUrl = window.location.origin + imagePath;
               editor?.chain().focus().setImage({ src: imageUrl }).run();
             }).catch((error) => {
-              console.error('Failed to upload pasted image:', error);
+              // Handle upload error silently in production
             });
             
             return true;
