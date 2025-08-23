@@ -325,6 +325,24 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
       </div>
 
+      {/* Fixed Status Bar - Always visible at bottom */}
+      <div className="border-t border-gray-200/60 px-6 py-3 bg-gray-50/20 flex-shrink-0">
+        <div className="flex items-center justify-between text-sm text-gray-500">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Auto-save enabled</span>
+            </div>
+            <span data-testid="text-character-count" className="text-gray-600">{editor.storage.characterCount?.characters() || 0} characters</span>
+          </div>
+          <div className="flex items-center space-x-3 text-gray-400">
+            <span>Ctrl+S to save</span>
+            <span>•</span>
+            <span>Ctrl+E to export</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
