@@ -124,18 +124,22 @@
   word-break: break-word;
 }
 
-.editor-content-scrollable {
+.editor-contained {
   width: 100%;
   max-width: 100%;
   position: relative;
 }
 
-.editor-content-scrollable .ProseMirror {
+.editor-contained .ProseMirror {
   width: 100% !important;
   max-width: 100% !important;
   min-height: 400px;
-  position: relative;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  top: auto !important;
   overflow: visible;
+  contain: layout style;
 }
 
 /* Custom scrollbar styling */
