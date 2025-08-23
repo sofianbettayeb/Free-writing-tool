@@ -124,15 +124,19 @@
   word-break: break-word;
 }
 
-.editor-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow: hidden !important;
+.editor-content-fixed {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-.editor-container .ProseMirror {
+.editor-content-fixed .ProseMirror {
   width: 100% !important;
   max-width: 100% !important;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
 }
 
 .ProseMirror p {
