@@ -19,6 +19,7 @@ export default function Journal() {
   const [hasAutoSaved, setHasAutoSaved] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [currentEntry, setCurrentEntry] = useLocalStorage<Partial<JournalEntry>>("currentEntry", {
     title: "",
     content: "",
@@ -141,6 +142,7 @@ export default function Journal() {
     setSelectedEntryId(null);
     setHasAutoSaved(false);
     setIsAutoSaving(false);
+    setHasInteracted(false);
     setShowDeleteConfirm(false); // Reset delete confirmation when creating new entry
     setCurrentEntry({ title: "", content: "", wordCount: "0" });
   };
@@ -164,6 +166,7 @@ export default function Journal() {
     // Switch to selected entry
     setSelectedEntryId(entry.id);
     setHasAutoSaved(true);
+    setHasInteracted(false); // Reset interaction flag when switching entries
     setShowDeleteConfirm(false); // Reset delete confirmation when switching entries
     setCurrentEntry({
       title: entry.title,
@@ -198,8 +201,8 @@ export default function Journal() {
         // Update existing entry
         setIsAutoSaving(true);
         updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-      } else if (!hasAutoSaved) {
-        // Only create new entry if we haven't auto-saved yet
+      } else if (!hasAutoSaved && hasInteracted) {
+        // Only create new entry if we haven't auto-saved yet AND user has actually typed something
         setIsAutoSaving(true);
         setHasAutoSaved(true); // Set immediately to prevent duplicate creation
         createEntryMutation.mutate(entryData);
@@ -207,7 +210,7 @@ export default function Journal() {
     }, 2000); // Auto-save after 2 seconds of no changes
 
     return () => clearTimeout(autoSave);
-  }, [currentEntry, selectedEntryId, hasAutoSaved, isAutoSaving]);
+  }, [currentEntry, selectedEntryId, hasAutoSaved, isAutoSaving, hasInteracted]);
 
   const handleDeleteEntry = () => {
     if (selectedEntryId) {
@@ -322,7 +325,10 @@ export default function Journal() {
         <div className="flex flex-col min-h-0 flex-1">
           <Editor
             entry={currentEntry}
-            onUpdate={setCurrentEntry}
+            onUpdate={(entry) => {
+              setCurrentEntry(entry);
+              setHasInteracted(true); // Mark that user has interacted with the editor
+            }}
           />
         </div>
       </div>
