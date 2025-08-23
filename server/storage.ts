@@ -31,7 +31,8 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const entry: JournalEntry = { 
-      ...insertEntry, 
+      ...insertEntry,
+      wordCount: insertEntry.wordCount || "0",
       id, 
       createdAt: now,
       updatedAt: now

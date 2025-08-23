@@ -96,7 +96,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
     setSelectedFont(fontValue);
     const font = FONT_OPTIONS.find(f => f.value === fontValue);
     if (font && editor) {
-      const editorElement = editor.options.element;
+      const editorElement = editor.options.element as HTMLElement;
       if (editorElement) {
         editorElement.style.fontFamily = font.family;
       }
