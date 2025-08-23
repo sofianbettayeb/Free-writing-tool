@@ -299,7 +299,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       {/* Editor Area - Fixed Layout */}
       <div className="h-full flex flex-col bg-white">
         {/* Fixed Title Input */}
-        <div className="border-b border-gray-100 px-8 py-6 flex-shrink-0">
+        <div className="border-b border-gray-100 px-4 md:px-8 py-6 flex-shrink-0">
           <input
             type="text"
             value={title}
@@ -311,8 +311,8 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
         
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-8 py-6">
-          <div className="max-w-4xl mx-auto">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 md:px-8 py-6">
+          <div className="w-full max-w-none md:max-w-4xl md:mx-auto">
             <EditorContent
               editor={editor}
               className="editor-contained"
@@ -326,7 +326,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       </div>
 
       {/* Fixed Status Bar - Always visible at bottom */}
-      <div className="border-t border-gray-200/60 px-6 py-3 bg-gray-50/20 flex-shrink-0">
+      <div className="border-t border-gray-200/60 px-4 md:px-6 py-3 bg-gray-50/20 flex-shrink-0">
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
