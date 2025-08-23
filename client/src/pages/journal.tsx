@@ -93,6 +93,22 @@ export default function Journal() {
   };
 
   const handleNewEntry = () => {
+    // Auto-save current entry if it has content
+    if (currentEntry.title?.trim() || currentEntry.content?.trim()) {
+      const entryData: InsertJournalEntry = {
+        title: currentEntry.title || "Untitled",
+        content: currentEntry.content || "",
+        wordCount: currentEntry.wordCount || "0",
+      };
+
+      if (selectedEntryId) {
+        updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
+      } else {
+        createEntryMutation.mutate(entryData);
+      }
+    }
+    
+    // Reset to new entry
     setSelectedEntryId(null);
     setCurrentEntry({ title: "", content: "", wordCount: "0" });
   };
@@ -165,19 +181,6 @@ export default function Journal() {
             </div>
 
             <div className="flex items-center space-x-2">
-              {!sidebarOpen && (
-                <button
-                  onClick={handleNewEntry}
-                  className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                  data-testid="button-new-entry-header"
-                  title="New entry"
-                >
-                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
-                  </svg>
-                  New
-                </button>
-              )}
               <button
                 onClick={() => setShowExportModal(true)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
