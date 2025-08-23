@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { JournalEntry, InsertJournalEntry } from "@shared/schema";
+import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
 import { Sidebar } from "@/components/sidebar";
 import { Editor } from "@/components/editor";
 import { ExportModal } from "@/components/export-modal";
 import { Timer } from "@/components/timer";
 import { useLocalStorage } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Journal() {
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
@@ -204,7 +206,8 @@ export default function Journal() {
   const displayedEntries = searchQuery ? searchResults : entries;
 
   return (
-    <div className="fixed inset-0 grid grid-rows-[56px_1fr_44px] bg-gray-50/30" data-testid="journal-app">
+    <AuthenticatedLayout>
+      <div className="h-full grid grid-rows-[56px_1fr_44px] bg-gray-50/30" data-testid="journal-app">
       {/* Header Row */}
       <div className="border-b border-gray-200/60 px-4 md:px-8 py-5 bg-white/80 backdrop-blur-sm flex items-center justify-between">
             <div className="flex items-center space-x-6">
@@ -343,6 +346,7 @@ export default function Journal() {
         entries={entries}
         selectedEntryId={selectedEntryId}
       />
-    </div>
+      </div>
+    </AuthenticatedLayout>
   );
 }

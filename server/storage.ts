@@ -1,73 +1,115 @@
-import { type JournalEntry, type InsertJournalEntry } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { 
+  type JournalEntry, 
+  type InsertJournalEntry, 
+  type UpsertUser, 
+  type User, 
+  users, 
+  journalEntries 
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, or, ilike } from "drizzle-orm";
 
 export interface IStorage {
-  getJournalEntry(id: string): Promise<JournalEntry | undefined>;
-  getAllJournalEntries(): Promise<JournalEntry[]>;
-  createJournalEntry(entry: InsertJournalEntry): Promise<JournalEntry>;
-  updateJournalEntry(id: string, entry: Partial<InsertJournalEntry>): Promise<JournalEntry | undefined>;
-  deleteJournalEntry(id: string): Promise<boolean>;
-  searchJournalEntries(query: string): Promise<JournalEntry[]>;
+  // User operations (required for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
+  // Journal entry operations (user-aware)
+  getJournalEntry(id: string, userId: string): Promise<JournalEntry | undefined>;
+  getAllJournalEntries(userId: string): Promise<JournalEntry[]>;
+  createJournalEntry(entry: InsertJournalEntry, userId: string): Promise<JournalEntry>;
+  updateJournalEntry(id: string, entry: Partial<InsertJournalEntry>, userId: string): Promise<JournalEntry | undefined>;
+  deleteJournalEntry(id: string, userId: string): Promise<boolean>;
+  searchJournalEntries(query: string, userId: string): Promise<JournalEntry[]>;
 }
 
-export class MemStorage implements IStorage {
-  private entries: Map<string, JournalEntry>;
-
-  constructor() {
-    this.entries = new Map();
+export class DatabaseStorage implements IStorage {
+  // User operations (required for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
-  async getJournalEntry(id: string): Promise<JournalEntry | undefined> {
-    return this.entries.get(id);
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 
-  async getAllJournalEntries(): Promise<JournalEntry[]> {
-    return Array.from(this.entries.values()).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }
-
-  async createJournalEntry(insertEntry: InsertJournalEntry): Promise<JournalEntry> {
-    const id = randomUUID();
-    const now = new Date();
-    const entry: JournalEntry = { 
-      ...insertEntry,
-      wordCount: insertEntry.wordCount || "0",
-      id, 
-      createdAt: now,
-      updatedAt: now
-    };
-    this.entries.set(id, entry);
+  // Journal entry operations (user-aware)
+  async getJournalEntry(id: string, userId: string): Promise<JournalEntry | undefined> {
+    const [entry] = await db
+      .select()
+      .from(journalEntries)
+      .where(eq(journalEntries.id, id) && eq(journalEntries.userId, userId));
     return entry;
   }
 
-  async updateJournalEntry(id: string, updateData: Partial<InsertJournalEntry>): Promise<JournalEntry | undefined> {
-    const existing = this.entries.get(id);
-    if (!existing) return undefined;
+  async getAllJournalEntries(userId: string): Promise<JournalEntry[]> {
+    return await db
+      .select()
+      .from(journalEntries)
+      .where(eq(journalEntries.userId, userId))
+      .orderBy(desc(journalEntries.createdAt));
+  }
 
-    const updated: JournalEntry = {
-      ...existing,
-      ...updateData,
-      updatedAt: new Date()
-    };
-    
-    this.entries.set(id, updated);
+  async createJournalEntry(insertEntry: InsertJournalEntry, userId: string): Promise<JournalEntry> {
+    const [entry] = await db
+      .insert(journalEntries)
+      .values({
+        ...insertEntry,
+        wordCount: insertEntry.wordCount || "0",
+        userId,
+      })
+      .returning();
+    return entry;
+  }
+
+  async updateJournalEntry(
+    id: string, 
+    updateData: Partial<InsertJournalEntry>, 
+    userId: string
+  ): Promise<JournalEntry | undefined> {
+    const [updated] = await db
+      .update(journalEntries)
+      .set({
+        ...updateData,
+        updatedAt: new Date(),
+      })
+      .where(eq(journalEntries.id, id) && eq(journalEntries.userId, userId))
+      .returning();
     return updated;
   }
 
-  async deleteJournalEntry(id: string): Promise<boolean> {
-    return this.entries.delete(id);
+  async deleteJournalEntry(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(journalEntries)
+      .where(eq(journalEntries.id, id) && eq(journalEntries.userId, userId));
+    return (result.rowCount ?? 0) > 0;
   }
 
-  async searchJournalEntries(query: string): Promise<JournalEntry[]> {
-    const lowerQuery = query.toLowerCase();
-    return Array.from(this.entries.values())
-      .filter(entry => 
-        entry.title.toLowerCase().includes(lowerQuery) ||
-        entry.content.toLowerCase().includes(lowerQuery)
+  async searchJournalEntries(query: string, userId: string): Promise<JournalEntry[]> {
+    return await db
+      .select()
+      .from(journalEntries)
+      .where(
+        eq(journalEntries.userId, userId) &&
+        or(
+          ilike(journalEntries.title, `%${query}%`),
+          ilike(journalEntries.content, `%${query}%`)
+        )
       )
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .orderBy(desc(journalEntries.createdAt));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
