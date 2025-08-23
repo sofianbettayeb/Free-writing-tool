@@ -63,7 +63,6 @@ export default function Journal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
-      toast({ title: "Entry updated successfully" });
     },
     onError: () => {
       toast({ 
