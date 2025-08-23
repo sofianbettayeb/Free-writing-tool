@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertJournalEntrySchema } from "@shared/schema";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all journal entries
@@ -72,6 +73,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(entries);
     } catch (error) {
       res.status(500).json({ message: "Search failed" });
+    }
+  });
+
+  // Image upload endpoint
+  app.post("/api/images/upload", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getImageUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting image upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  // Serve images
+  app.get("/images/:imagePath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const imageFile = await objectStorageService.getImageFile(req.path);
+      objectStorageService.downloadObject(imageFile, res);
+    } catch (error) {
+      console.error("Error serving image:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 

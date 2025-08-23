@@ -4,6 +4,7 @@ import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { useState, useCallback, useEffect } from 'react';
 import { JournalEntry } from '@shared/schema';
+import { uploadImage, getImageFromClipboard, getImagesFromDrop, isImageFile } from '@/lib/imageUpload';
 
 interface EditorProps {
   entry: Partial<JournalEntry>;
@@ -36,6 +37,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         HTMLAttributes: {
           class: 'max-w-full h-auto rounded-lg my-4',
         },
+        allowBase64: true,
       }),
     ],
     content: entry.content || '',
@@ -49,6 +51,60 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         content,
         wordCount: wordCount.toString(),
       });
+    },
+    editorProps: {
+      handleDOMEvents: {
+        drop: (view, event) => {
+          event.preventDefault();
+          const files = getImagesFromDrop(event.dataTransfer!);
+          
+          if (files.length > 0) {
+            const { schema } = view.state;
+            const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+            
+            files.forEach(async (file) => {
+              try {
+                const imagePath = await uploadImage(file);
+                const imageUrl = window.location.origin + imagePath;
+                
+                if (coordinates) {
+                  const node = schema.nodes.image.create({ src: imageUrl });
+                  const transaction = view.state.tr.insert(coordinates.pos, node);
+                  view.dispatch(transaction);
+                }
+              } catch (error) {
+                console.error('Failed to upload image:', error);
+              }
+            });
+          }
+          
+          return false;
+        },
+        dragover: (view, event) => {
+          event.preventDefault();
+          return false;
+        },
+        paste: (view, event) => {
+          const clipboardData = event.clipboardData;
+          if (!clipboardData) return false;
+          
+          const imageFile = getImageFromClipboard(clipboardData);
+          if (imageFile) {
+            event.preventDefault();
+            
+            uploadImage(imageFile).then((imagePath) => {
+              const imageUrl = window.location.origin + imagePath;
+              editor?.chain().focus().setImage({ src: imageUrl }).run();
+            }).catch((error) => {
+              console.error('Failed to upload pasted image:', error);
+            });
+            
+            return true;
+          }
+          
+          return false;
+        },
+      },
     },
   });
 
@@ -91,10 +147,22 @@ export function Editor({ entry, onUpdate }: EditorProps) {
   }, [editor]);
 
   const insertImage = useCallback(() => {
-    const url = window.prompt('Enter image URL:');
-    if (url) {
-      editor?.chain().focus().setImage({ src: url }).run();
-    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file && isImageFile(file)) {
+        try {
+          const imagePath = await uploadImage(file);
+          const imageUrl = window.location.origin + imagePath;
+          editor?.chain().focus().setImage({ src: imageUrl }).run();
+        } catch (error) {
+          console.error('Failed to upload image:', error);
+        }
+      }
+    };
+    input.click();
   }, [editor]);
 
   const changeFontFamily = (fontValue: string) => {
