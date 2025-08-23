@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Charter:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 25%, 7.8431%);
+  --card: hsl(210, 11.1111%, 96.4706%);
+  --card-foreground: hsl(210, 25%, 7.8431%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 25%, 7.8431%);
+  --primary: hsl(220, 91.2281%, 54.7059%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 11.1111%, 96.4706%);
+  --secondary-foreground: hsl(210, 25%, 7.8431%);
+  --muted: hsl(210, 11.1111%, 96.4706%);
+  --muted-foreground: hsl(215, 13.7931%, 34.1176%);
+  --accent: hsl(210, 11.1111%, 96.4706%);
+  --accent-foreground: hsl(210, 25%, 7.8431%);
+  --destructive: hsl(0, 84.2105%, 60.1961%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(214, 31.8182%, 91.3725%);
+  --input: hsl(214, 31.8182%, 91.3725%);
+  --ring: hsl(221, 83.1169%, 53.7255%);
+  --chart-1: hsl(220, 91.2281%, 54.7059%);
+  --chart-2: hsl(173, 58.1818%, 39.2157%);
+  --chart-3: hsl(43, 89.4737%, 49.4118%);
+  --chart-4: hsl(27, 87.0588%, 66.6667%);
+  --chart-5: hsl(340, 75.5556%, 55.4902%);
+  --sidebar: hsl(210, 11.1111%, 96.4706%);
+  --sidebar-foreground: hsl(210, 25%, 7.8431%);
+  --sidebar-primary: hsl(220, 91.2281%, 54.7059%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(210, 11.1111%, 96.4706%);
+  --sidebar-accent-foreground: hsl(210, 25%, 7.8431%);
+  --sidebar-border: hsl(214, 31.8182%, 91.3725%);
+  --sidebar-ring: hsl(221, 83.1169%, 53.7255%);
+  --radius: 0.75rem;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-charter: 'Charter', Georgia, serif;
+  --font-mono: 'JetBrains Mono', Menlo, monospace;
+}
+
+.dark {
+  --background: hsl(0, 0%, 3.9216%);
+  --foreground: hsl(0, 0%, 98.0392%);
+  --card: hsl(0, 0%, 3.9216%);
+  --card-foreground: hsl(0, 0%, 98.0392%);
+  --popover: hsl(0, 0%, 3.9216%);
+  --popover-foreground: hsl(0, 0%, 98.0392%);
+  --primary: hsl(0, 0%, 98.0392%);
+  --primary-foreground: hsl(0, 0%, 9.0196%);
+  --secondary: hsl(0, 0%, 14.7059%);
+  --secondary-foreground: hsl(0, 0%, 98.0392%);
+  --muted: hsl(0, 0%, 14.7059%);
+  --muted-foreground: hsl(0, 0%, 63.9216%);
+  --accent: hsl(0, 0%, 14.7059%);
+  --accent-foreground: hsl(0, 0%, 98.0392%);
+  --destructive: hsl(0, 62.7907%, 30.5882%);
+  --destructive-foreground: hsl(0, 0%, 98.0392%);
+  --border: hsl(0, 0%, 14.7059%);
+  --input: hsl(0, 0%, 14.7059%);
+  --ring: hsl(212.7273, 26.8293%, 83.9216%);
+  --chart-1: hsl(220, 70%, 50%);
+  --chart-2: hsl(160, 60%, 45%);
+  --chart-3: hsl(30, 80%, 55%);
+  --chart-4: hsl(280, 65%, 60%);
+  --chart-5: hsl(340, 75%, 55%);
+  --sidebar: hsl(0, 0%, 3.9216%);
+  --sidebar-foreground: hsl(0, 0%, 98.0392%);
+  --sidebar-primary: hsl(0, 0%, 98.0392%);
+  --sidebar-primary-foreground: hsl(0, 0%, 9.0196%);
+  --sidebar-accent: hsl(0, 0%, 14.7059%);
+  --sidebar-accent-foreground: hsl(0, 0%, 98.0392%);
+  --sidebar-border: hsl(0, 0%, 14.7059%);
+  --sidebar-ring: hsl(212.7273, 26.8293%, 83.9216%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+  }
+
+  .font-inter {
+    font-family: var(--font-inter);
+  }
+
+  .font-charter {
+    font-family: var(--font-charter);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  outline: none;
+  min-height: 400px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror strong {
+  font-weight: 600;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror ul {
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+.ProseMirror a {
+  color: hsl(220, 91.2281%, 54.7059%);
+  text-decoration: underline;
+}
+
+.ProseMirror a:hover {
+  color: hsl(220, 91.2281%, 44.7059%);
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* Animation for pulse effect */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
