@@ -298,7 +298,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
 
       {/* Editor Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="max-w-4xl mx-auto px-8 py-12">
+        <div className="max-w-4xl mx-auto px-8 py-12 min-h-full">
           <input
             type="text"
             value={title}
