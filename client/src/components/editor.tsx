@@ -58,6 +58,11 @@ export function Editor({ entry, onUpdate }: EditorProps) {
     }
   }, [entry.content, editor]);
 
+  // Sync title state with entry prop
+  useEffect(() => {
+    setTitle(entry.title || '');
+  }, [entry.title]);
+
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
     onUpdate({
