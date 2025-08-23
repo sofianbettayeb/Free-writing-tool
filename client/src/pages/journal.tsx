@@ -205,7 +205,7 @@ export default function Journal() {
   const displayedEntries = searchQuery ? searchResults : entries;
 
   return (
-    <div className="flex h-screen bg-white" data-testid="journal-app">
+    <div className="flex h-screen bg-gray-50/30" data-testid="journal-app">
       <Sidebar
         entries={displayedEntries}
         selectedEntryId={selectedEntryId}
@@ -218,10 +218,10 @@ export default function Journal() {
         isLoading={isLoading}
       />
 
-      <div className="flex-1 flex flex-col">
-        <div className="border-b border-gray-200 px-6 py-4">
+      <div className="flex-1 flex flex-col bg-white shadow-xl">
+        <div className="border-b border-gray-200/60 px-8 py-5 bg-white/80 backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               {!sidebarOpen && (
                 <button
                   onClick={() => setSidebarOpen(true)}
@@ -234,11 +234,11 @@ export default function Journal() {
                   </svg>
                 </button>
               )}
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center space-x-3 text-sm text-gray-700 bg-gray-100/50 px-4 py-2 rounded-lg">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                <span>{new Date().toLocaleDateString('en-US', { 
+                <span className="font-medium">{new Date().toLocaleDateString('en-US', { 
                   weekday: 'long', 
                   year: 'numeric', 
                   month: 'long', 
@@ -248,9 +248,9 @@ export default function Journal() {
               <Timer />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               {selectedEntryId && (
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-2">
                   {!showDeleteConfirm ? (
                     <button
                       onClick={() => setShowDeleteConfirm(true)}
@@ -292,10 +292,11 @@ export default function Journal() {
               
               <button
                 onClick={() => setShowExportModal(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2.5 hover:bg-blue-50 rounded-lg transition-colors group"
                 data-testid="button-export"
+                title="Export entry"
               >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
               </button>
