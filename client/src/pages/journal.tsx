@@ -15,6 +15,7 @@ export default function Journal() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [hasAutoSaved, setHasAutoSaved] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentEntry, setCurrentEntry] = useLocalStorage<Partial<JournalEntry>>("currentEntry", {
     title: "",
     content: "",
@@ -72,6 +73,27 @@ export default function Journal() {
     },
   });
 
+  // Delete entry mutation
+  const deleteEntryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/entries/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
+      setSelectedEntryId(null);
+      setHasAutoSaved(false);
+      setCurrentEntry({ title: "", content: "", wordCount: "0" });
+      setShowDeleteConfirm(false);
+      toast({ title: "Entry deleted successfully" });
+    },
+    onError: () => {
+      toast({ 
+        title: "Failed to delete entry", 
+        variant: "destructive" 
+      });
+    },
+  });
+
   const handleSaveEntry = () => {
     if (!currentEntry.title?.trim() || !currentEntry.content?.trim()) {
       toast({ 
@@ -113,6 +135,7 @@ export default function Journal() {
     // Reset to new entry
     setSelectedEntryId(null);
     setHasAutoSaved(false);
+    setShowDeleteConfirm(false); // Reset delete confirmation when creating new entry
     setCurrentEntry({ title: "", content: "", wordCount: "0" });
   };
 
@@ -135,6 +158,7 @@ export default function Journal() {
     // Switch to selected entry
     setSelectedEntryId(entry.id);
     setHasAutoSaved(true);
+    setShowDeleteConfirm(false); // Reset delete confirmation when switching entries
     setCurrentEntry({
       title: entry.title,
       content: entry.content,
@@ -172,6 +196,12 @@ export default function Journal() {
 
     return () => clearTimeout(autoSave);
   }, [currentEntry, selectedEntryId, hasAutoSaved]); // Added hasAutoSaved to dependencies
+
+  const handleDeleteEntry = () => {
+    if (selectedEntryId) {
+      deleteEntryMutation.mutate(selectedEntryId);
+    }
+  };
 
   const displayedEntries = searchQuery ? searchResults : entries;
 
@@ -220,6 +250,47 @@ export default function Journal() {
             </div>
 
             <div className="flex items-center space-x-2">
+              {selectedEntryId && (
+                <div className="flex items-center space-x-1">
+                  {!showDeleteConfirm ? (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                      data-testid="button-delete-entry"
+                      title="Delete entry"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  ) : (
+                    <div className="flex items-center space-x-1">
+                      <button
+                        onClick={handleDeleteEntry}
+                        disabled={deleteEntryMutation.isPending}
+                        className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600 disabled:opacity-50"
+                        data-testid="button-confirm-delete"
+                        title="Confirm delete"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+                        data-testid="button-cancel-delete"
+                        title="Cancel delete"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <button
                 onClick={() => setShowExportModal(true)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -230,13 +301,13 @@ export default function Journal() {
                 </svg>
               </button>
               
-              {(createEntryMutation.isPending || updateEntryMutation.isPending) && (
+              {(createEntryMutation.isPending || updateEntryMutation.isPending || deleteEntryMutation.isPending) && (
                 <div className="flex items-center text-sm text-gray-500">
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Saving...
+                  {deleteEntryMutation.isPending ? "Deleting..." : "Saving..."}
                 </div>
               )}
             </div>

@@ -103,6 +103,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete entry
+  app.delete("/api/entries/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteJournalEntry(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Entry not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Delete entry error:", error);
+      res.status(500).json({ message: "Failed to delete entry" });
+    }
+  });
+
   // Export entries
   app.post("/api/export", async (req, res) => {
     try {
