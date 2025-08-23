@@ -106,8 +106,6 @@
   line-height: 1.7;
   font-size: 16px;
   color: hsl(210, 25%, 7.8431%);
-  position: relative;
-  z-index: 1;
 }
 
 .ProseMirror p {
@@ -128,7 +126,6 @@
 .ProseMirror p.is-editor-empty:first-child::before {
   color: #adb5bd;
   content: attr(data-placeholder);
-  position: absolute;
   pointer-events: none;
   font-style: italic;
   opacity: 0.6;
