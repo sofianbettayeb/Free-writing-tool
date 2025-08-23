@@ -268,12 +268,12 @@ export default function Journal() {
                       <button
                         onClick={handleDeleteEntry}
                         disabled={deleteEntryMutation.isPending}
-                        className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600 disabled:opacity-50"
+                        className="p-2 hover:bg-green-100 rounded-lg transition-colors text-green-600 disabled:opacity-50"
                         data-testid="button-confirm-delete"
                         title="Confirm delete"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                       </button>
                       <button
