@@ -14,6 +14,7 @@ export default function Journal() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [hasAutoSaved, setHasAutoSaved] = useState(false);
   const [currentEntry, setCurrentEntry] = useLocalStorage<Partial<JournalEntry>>("currentEntry", {
     title: "",
     content: "",
@@ -39,9 +40,10 @@ export default function Journal() {
       const response = await apiRequest("POST", "/api/entries", entryData);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (newEntry) => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
-      setCurrentEntry({ title: "", content: "", wordCount: "0" });
+      setSelectedEntryId(newEntry.id); // Set the ID so future saves will update instead of create
+      setHasAutoSaved(true);
       toast({ title: "Entry saved successfully" });
     },
     onError: () => {
@@ -110,6 +112,7 @@ export default function Journal() {
     
     // Reset to new entry
     setSelectedEntryId(null);
+    setHasAutoSaved(false);
     setCurrentEntry({ title: "", content: "", wordCount: "0" });
   };
 
@@ -131,6 +134,7 @@ export default function Journal() {
 
     // Switch to selected entry
     setSelectedEntryId(entry.id);
+    setHasAutoSaved(true);
     setCurrentEntry({
       title: entry.title,
       content: entry.content,
@@ -140,24 +144,34 @@ export default function Journal() {
 
   // Auto-save functionality - save to server after typing stops
   useEffect(() => {
-    const autoSave = setTimeout(() => {
-      if (currentEntry.title?.trim() || currentEntry.content?.trim()) {
-        const entryData: InsertJournalEntry = {
-          title: currentEntry.title || "Untitled",
-          content: currentEntry.content || "",
-          wordCount: currentEntry.wordCount || "0",
-        };
+    // Don't auto-save if mutations are pending to avoid duplicates
+    if (createEntryMutation.isPending || updateEntryMutation.isPending) {
+      return;
+    }
 
-        if (selectedEntryId) {
-          updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-        } else {
-          createEntryMutation.mutate(entryData);
-        }
+    // Don't auto-save empty content
+    if (!currentEntry.title?.trim() && !currentEntry.content?.trim()) {
+      return;
+    }
+
+    const autoSave = setTimeout(() => {
+      const entryData: InsertJournalEntry = {
+        title: currentEntry.title || "Untitled",
+        content: currentEntry.content || "",
+        wordCount: currentEntry.wordCount || "0",
+      };
+
+      if (selectedEntryId) {
+        // Update existing entry
+        updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
+      } else if (!hasAutoSaved) {
+        // Only create new entry if we haven't auto-saved yet
+        createEntryMutation.mutate(entryData);
       }
     }, 2000); // Auto-save after 2 seconds of no changes
 
     return () => clearTimeout(autoSave);
-  }, [currentEntry, selectedEntryId, createEntryMutation, updateEntryMutation]);
+  }, [currentEntry, selectedEntryId, hasAutoSaved]); // Added hasAutoSaved to dependencies
 
   const displayedEntries = searchQuery ? searchResults : entries;
 
