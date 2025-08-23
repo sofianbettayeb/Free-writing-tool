@@ -308,12 +308,15 @@ export function Editor({ entry, onUpdate }: EditorProps) {
             data-testid="input-title"
           />
           
-          <div className="relative">
+          <div className="w-full">
             <EditorContent
               editor={editor}
-              className="focus:outline-none min-h-[500px] w-full"
+              className="w-full min-h-[500px] block"
               style={{
-                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
+                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif',
+                position: 'static',
+                display: 'block',
+                width: '100%'
               }}
               data-testid="editor-content"
             />
