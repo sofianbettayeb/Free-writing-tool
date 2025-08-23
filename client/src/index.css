@@ -124,19 +124,37 @@
   word-break: break-word;
 }
 
-.editor-content-fixed {
+.editor-content-scrollable {
   width: 100%;
   max-width: 100%;
   position: relative;
-  z-index: 1;
 }
 
-.editor-content-fixed .ProseMirror {
+.editor-content-scrollable .ProseMirror {
   width: 100% !important;
   max-width: 100% !important;
+  min-height: 400px;
   position: relative;
-  z-index: 1;
   overflow: visible;
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .ProseMirror p {
