@@ -17,6 +17,7 @@ export default function Journal() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [hasAutoSaved, setHasAutoSaved] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentEntry, setCurrentEntry] = useLocalStorage<Partial<JournalEntry>>("currentEntry", {
     title: "",
@@ -47,8 +48,10 @@ export default function Journal() {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(newEntry.id); // Set the ID so future saves will update instead of create
       setHasAutoSaved(true);
+      setIsAutoSaving(false);
     },
     onError: () => {
+      setIsAutoSaving(false);
       toast({ 
         title: "Failed to save entry", 
         variant: "destructive" 
@@ -64,8 +67,10 @@ export default function Journal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
+      setIsAutoSaving(false);
     },
     onError: () => {
+      setIsAutoSaving(false);
       toast({ 
         title: "Failed to update entry", 
         variant: "destructive" 
@@ -127,7 +132,7 @@ export default function Journal() {
 
       if (selectedEntryId) {
         updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-      } else {
+      } else if (!hasAutoSaved && !isAutoSaving) {
         createEntryMutation.mutate(entryData);
       }
     }
@@ -135,6 +140,7 @@ export default function Journal() {
     // Reset to new entry
     setSelectedEntryId(null);
     setHasAutoSaved(false);
+    setIsAutoSaving(false);
     setShowDeleteConfirm(false); // Reset delete confirmation when creating new entry
     setCurrentEntry({ title: "", content: "", wordCount: "0" });
   };
@@ -168,8 +174,8 @@ export default function Journal() {
 
   // Auto-save functionality - save to server after typing stops
   useEffect(() => {
-    // Don't auto-save if mutations are pending to avoid duplicates
-    if (createEntryMutation.isPending || updateEntryMutation.isPending) {
+    // Don't auto-save if mutations are pending or already auto-saving to avoid duplicates
+    if (createEntryMutation.isPending || updateEntryMutation.isPending || isAutoSaving) {
       return;
     }
 
@@ -179,6 +185,9 @@ export default function Journal() {
     }
 
     const autoSave = setTimeout(() => {
+      // Double-check we're not already auto-saving
+      if (isAutoSaving) return;
+      
       const entryData: InsertJournalEntry = {
         title: currentEntry.title || "Untitled",
         content: currentEntry.content || "",
@@ -187,15 +196,18 @@ export default function Journal() {
 
       if (selectedEntryId) {
         // Update existing entry
+        setIsAutoSaving(true);
         updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
       } else if (!hasAutoSaved) {
         // Only create new entry if we haven't auto-saved yet
+        setIsAutoSaving(true);
+        setHasAutoSaved(true); // Set immediately to prevent duplicate creation
         createEntryMutation.mutate(entryData);
       }
     }, 2000); // Auto-save after 2 seconds of no changes
 
     return () => clearTimeout(autoSave);
-  }, [currentEntry, selectedEntryId, hasAutoSaved]); // Added hasAutoSaved to dependencies
+  }, [currentEntry, selectedEntryId, hasAutoSaved, isAutoSaving]);
 
   const handleDeleteEntry = () => {
     if (selectedEntryId) {
