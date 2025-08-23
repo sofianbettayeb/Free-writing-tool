@@ -7,7 +7,6 @@ import { Sidebar } from "@/components/sidebar";
 import { Editor } from "@/components/editor";
 import { ExportModal } from "@/components/export-modal";
 import { Timer } from "@/components/timer";
-import { useLocalStorage } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
@@ -20,7 +19,7 @@ export default function Journal() {
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [currentEntry, setCurrentEntry] = useLocalStorage<Partial<JournalEntry>>("currentEntry", {
+  const [currentEntry, setCurrentEntry] = useState<Partial<JournalEntry>>({
     title: "",
     content: "",
     wordCount: "0"
