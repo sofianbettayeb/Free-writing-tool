@@ -297,7 +297,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       </div>
 
       {/* Editor Area */}
-      <div className="flex-1 flex flex-col bg-white overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white">
         <div className="border-b border-gray-100 px-8 py-6 flex-shrink-0">
           <input
             type="text"
@@ -309,16 +309,18 @@ export function Editor({ entry, onUpdate }: EditorProps) {
           />
         </div>
         
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-8 py-6">
-          <div className="max-w-4xl mx-auto relative">
-            <EditorContent
-              editor={editor}
-              className="editor-content-scrollable"
-              style={{
-                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
-              }}
-              data-testid="editor-content"
-            />
+        <div className="flex-1 editor-wrapper">
+          <div className="h-full overflow-y-auto custom-scrollbar px-8 py-6">
+            <div className="max-w-4xl mx-auto">
+              <EditorContent
+                editor={editor}
+                className="editor-forced-container"
+                style={{
+                  fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
+                }}
+                data-testid="editor-content"
+              />
+            </div>
           </div>
         </div>
       </div>
