@@ -45,7 +45,6 @@ export default function Journal() {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(newEntry.id); // Set the ID so future saves will update instead of create
       setHasAutoSaved(true);
-      toast({ title: "Entry saved successfully" });
     },
     onError: () => {
       toast({ 

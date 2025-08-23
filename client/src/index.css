@@ -99,22 +99,40 @@
   }
 }
 
-/* TipTap Editor Styles */
+/* TipTap Editor Styles - Force containment */
 .ProseMirror {
   outline: none;
   border: none;
   background: transparent;
   width: 100%;
   min-height: 500px;
-  max-height: none;
   line-height: 1.7;
   font-size: 16px;
   color: hsl(210, 25%, 7.8431%);
   font-family: inherit;
   padding: 0;
   margin: 0;
-  overflow: visible;
   box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.ProseMirror * {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.editor-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.editor-container .ProseMirror {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .ProseMirror p {
