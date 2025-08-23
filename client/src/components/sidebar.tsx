@@ -51,8 +51,8 @@ export function Sidebar({
 
   return (
     <div 
-      className={`bg-gray-50 border-r border-gray-200 flex flex-col transition-all duration-300 ${
-        isOpen ? 'w-80' : 'w-0 overflow-hidden'
+      className={`bg-gray-50 border-r border-gray-200 flex flex-col min-h-0 transition-all duration-300 ${
+        isOpen ? 'w-80 overflow-y-auto' : 'w-0 overflow-hidden'
       }`}
       data-testid="sidebar"
     >

@@ -204,22 +204,9 @@ export default function Journal() {
   const displayedEntries = searchQuery ? searchResults : entries;
 
   return (
-    <div className="flex h-screen bg-gray-50/30" data-testid="journal-app">
-      <Sidebar
-        entries={displayedEntries}
-        selectedEntryId={selectedEntryId}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onSelectEntry={handleSelectEntry}
-        onNewEntry={handleNewEntry}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-        isLoading={isLoading}
-      />
-
-      <div className="flex-1 flex flex-col bg-white shadow-xl overflow-hidden">
-        <div className="border-b border-gray-200/60 px-4 md:px-8 py-5 bg-white/80 backdrop-blur-sm flex-shrink-0">
-          <div className="flex items-center justify-between">
+    <div className="grid grid-rows-[64px_1fr_44px] h-[100dvh] overflow-hidden bg-gray-50/30" data-testid="journal-app">
+      {/* Header Row */}
+      <div className="border-b border-gray-200/60 px-4 md:px-8 py-5 bg-white/80 backdrop-blur-sm flex items-center justify-between">
             <div className="flex items-center space-x-6">
               {!sidebarOpen && (
                 <button
@@ -310,14 +297,43 @@ export default function Journal() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+      </div>
 
-        <div className="flex-1 flex flex-col min-h-0">
+      {/* Workspace Row (Middle) */}
+      <div className="flex min-h-0 overflow-hidden">
+        <Sidebar
+          entries={displayedEntries}
+          selectedEntryId={selectedEntryId}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSelectEntry={handleSelectEntry}
+          onNewEntry={handleNewEntry}
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          isLoading={isLoading}
+        />
+
+        <div className="flex flex-col min-h-0 flex-1">
           <Editor
             entry={currentEntry}
             onUpdate={setCurrentEntry}
           />
+        </div>
+      </div>
+
+      {/* Footer Row */}
+      <div className="border-t border-gray-200/60 px-4 md:px-6 py-3 bg-gray-50/20 flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span>Auto-save enabled</span>
+          </div>
+          <span data-testid="text-character-count" className="text-gray-600">{currentEntry?.content ? currentEntry.content.replace(/<[^>]*>/g, '').length : 0} characters</span>
+        </div>
+        <div className="flex items-center space-x-3 text-gray-400">
+          <span>Ctrl+S to save</span>
+          <span>•</span>
+          <span>Ctrl+E to export</span>
         </div>
       </div>
 
