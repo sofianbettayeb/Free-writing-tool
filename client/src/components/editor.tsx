@@ -297,7 +297,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       </div>
 
       {/* Editor Area - Fixed Layout */}
-      <div className="flex-1 flex flex-col bg-white overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white min-h-0">
         {/* Fixed Title Input */}
         <div className="border-b border-gray-100 px-4 md:px-8 py-6 flex-shrink-0">
           <input
@@ -311,7 +311,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
         
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 md:px-8 py-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 md:px-8 py-6 min-h-0">
           <div className="w-full">
             <EditorContent
               editor={editor}
