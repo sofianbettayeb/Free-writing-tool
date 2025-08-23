@@ -297,7 +297,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       </div>
 
       {/* Editor Area - Fixed Layout */}
-      <div className="h-full flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-white overflow-hidden">
         {/* Fixed Title Input */}
         <div className="border-b border-gray-100 px-4 md:px-8 py-6 flex-shrink-0">
           <input
