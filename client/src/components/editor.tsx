@@ -308,16 +308,16 @@ export function Editor({ entry, onUpdate }: EditorProps) {
             data-testid="input-title"
           />
           
-          <EditorContent
-            editor={editor}
-            className={`prose prose-lg max-w-none focus:outline-none min-h-[500px] leading-relaxed ${
-              FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
-            }`}
-            style={{
-              fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
-            }}
-            data-testid="editor-content"
-          />
+          <div className="relative">
+            <EditorContent
+              editor={editor}
+              className="focus:outline-none min-h-[500px] w-full"
+              style={{
+                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
+              }}
+              data-testid="editor-content"
+            />
+          </div>
         </div>
       </div>
 
