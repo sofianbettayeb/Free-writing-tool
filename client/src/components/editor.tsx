@@ -2,13 +2,13 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
-import { useState, useCallback, useEffect } from 'react';
-import { JournalEntry } from '@shared/schema';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { JournalEntry, InsertJournalEntry } from '@shared/schema';
 import { uploadImage, getImageFromClipboard, getImagesFromDrop, isImageFile } from '@/lib/imageUpload';
 
 interface EditorProps {
-  entry: Partial<JournalEntry>;
-  onUpdate: (entry: Partial<JournalEntry>) => void;
+  entry: JournalEntry;
+  onUpdate: (data: Partial<InsertJournalEntry>) => void;
 }
 
 const FONT_OPTIONS = [
@@ -23,6 +23,7 @@ const FONT_OPTIONS = [
 export function Editor({ entry, onUpdate }: EditorProps) {
   const [selectedFont, setSelectedFont] = useState('inter');
   const [title, setTitle] = useState(entry.title || '');
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -46,11 +47,17 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       const text = editor.getText();
       const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
       
-      onUpdate({
-        ...entry,
-        content,
-        wordCount: wordCount.toString(),
-      });
+      // Debounce updates to database
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+      
+      updateTimeoutRef.current = setTimeout(() => {
+        onUpdate({
+          content,
+          wordCount: wordCount.toString(),
+        });
+      }, 1000); // Wait 1 second after typing stops
     },
     editorProps: {
       handleDOMEvents: {
@@ -108,23 +115,34 @@ export function Editor({ entry, onUpdate }: EditorProps) {
     },
   });
 
+  // Update editor content when entry changes (only when switching entries)
   useEffect(() => {
-    if (editor && entry.content !== editor.getHTML()) {
-      editor.commands.setContent(entry.content || '');
+    if (editor && entry.content !== undefined) {
+      const currentContent = editor.getHTML();
+      if (currentContent !== entry.content) {
+        editor.commands.setContent(entry.content || '');
+      }
     }
-  }, [entry.content, editor]);
+  }, [editor, entry.id]); // Only update when entry ID changes
 
   // Sync title state with entry prop
   useEffect(() => {
     setTitle(entry.title || '');
-  }, [entry.title]);
+  }, [entry.id, entry.title]); // Update when entry changes
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    onUpdate({
-      ...entry,
-      title: newTitle,
-    });
+    
+    // Debounce title updates
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    
+    updateTimeoutRef.current = setTimeout(() => {
+      onUpdate({
+        title: newTitle,
+      });
+    }, 1000);
   };
 
   const toggleBold = useCallback(() => {

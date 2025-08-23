@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { JournalEntry, InsertJournalEntry } from "@shared/schema";
@@ -15,16 +15,7 @@ export default function Journal() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [hasAutoSaved, setHasAutoSaved] = useState(false);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const [isNewEntry, setIsNewEntry] = useState(false);
-  const [currentEntry, setCurrentEntry] = useState<Partial<JournalEntry>>({
-    title: "",
-    content: "",
-    wordCount: "0"
-  });
 
   const { toast } = useToast();
 
@@ -47,12 +38,20 @@ export default function Journal() {
     },
     onSuccess: (newEntry) => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
-      setSelectedEntryId(newEntry.id); // Set the ID so future saves will update instead of create
-      setHasAutoSaved(true);
-      setIsAutoSaving(false);
+      setSelectedEntryId(newEntry.id);
     },
-    onError: () => {
-      setIsAutoSaving(false);
+    onError: (error) => {
+      if (isUnauthorizedError(error as Error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({ 
         title: "Failed to save entry", 
         variant: "destructive" 
@@ -68,10 +67,19 @@ export default function Journal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
-      setIsAutoSaving(false);
     },
-    onError: () => {
-      setIsAutoSaving(false);
+    onError: (error) => {
+      if (isUnauthorizedError(error as Error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({ 
         title: "Failed to update entry", 
         variant: "destructive" 
@@ -87,12 +95,21 @@ export default function Journal() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(null);
-      setHasAutoSaved(false);
-      setCurrentEntry({ title: "", content: "", wordCount: "0" });
       setShowDeleteConfirm(false);
       toast({ title: "Entry deleted successfully" });
     },
-    onError: () => {
+    onError: (error) => {
+      if (isUnauthorizedError(error as Error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
       toast({ 
         title: "Failed to delete entry", 
         variant: "destructive" 
@@ -100,119 +117,18 @@ export default function Journal() {
     },
   });
 
-  const handleSaveEntry = () => {
-    if (!currentEntry.title?.trim() || !currentEntry.content?.trim()) {
-      toast({ 
-        title: "Please enter a title and content", 
-        variant: "destructive" 
-      });
-      return;
-    }
-
-    const entryData: InsertJournalEntry = {
-      title: currentEntry.title,
-      content: currentEntry.content,
-      wordCount: currentEntry.wordCount || "0",
-    };
-
-    if (selectedEntryId) {
-      updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-    } else {
-      createEntryMutation.mutate(entryData);
-    }
-  };
-
   const handleNewEntry = () => {
-    // Auto-save current entry if it has content
-    if (currentEntry.title?.trim() || currentEntry.content?.trim()) {
-      const entryData: InsertJournalEntry = {
-        title: currentEntry.title || "Untitled",
-        content: currentEntry.content || "",
-        wordCount: currentEntry.wordCount || "0",
-      };
-
-      if (selectedEntryId) {
-        updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-      } else if (!hasAutoSaved && !isAutoSaving) {
-        createEntryMutation.mutate(entryData);
-      }
-    }
-    
-    // Reset to new entry
-    setSelectedEntryId(null);
-    setHasAutoSaved(false);
-    setIsAutoSaving(false);
-    setHasInteracted(false);
-    setIsNewEntry(true); // Mark that this is explicitly a new entry
-    setShowDeleteConfirm(false); // Reset delete confirmation when creating new entry
-    setCurrentEntry({ title: "", content: "", wordCount: "0" });
-  };
-
-  const handleSelectEntry = (entry: JournalEntry) => {
-    // Auto-save current entry before switching
-    if (currentEntry.title?.trim() || currentEntry.content?.trim()) {
-      const entryData: InsertJournalEntry = {
-        title: currentEntry.title || "Untitled",
-        content: currentEntry.content || "",
-        wordCount: currentEntry.wordCount || "0",
-      };
-
-      if (selectedEntryId) {
-        updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-      } else {
-        createEntryMutation.mutate(entryData);
-      }
-    }
-
-    // Switch to selected entry
-    setSelectedEntryId(entry.id);
-    setHasAutoSaved(true);
-    setHasInteracted(false); // Reset interaction flag when switching entries
-    setIsNewEntry(false); // This is not a new entry
-    setShowDeleteConfirm(false); // Reset delete confirmation when switching entries
-    setCurrentEntry({
-      title: entry.title,
-      content: entry.content,
-      wordCount: entry.wordCount,
+    createEntryMutation.mutate({
+      title: "Untitled",
+      content: "",
+      wordCount: "0",
     });
   };
 
-  // Auto-save functionality - save to server after typing stops
-  useEffect(() => {
-    // Don't auto-save if mutations are pending or already auto-saving to avoid duplicates
-    if (createEntryMutation.isPending || updateEntryMutation.isPending || isAutoSaving) {
-      return;
-    }
-
-    // Don't auto-save empty content
-    if (!currentEntry.title?.trim() && !currentEntry.content?.trim()) {
-      return;
-    }
-
-    const autoSave = setTimeout(() => {
-      // Double-check we're not already auto-saving
-      if (isAutoSaving) return;
-      
-      const entryData: InsertJournalEntry = {
-        title: currentEntry.title || "Untitled",
-        content: currentEntry.content || "",
-        wordCount: currentEntry.wordCount || "0",
-      };
-
-      if (selectedEntryId) {
-        // Update existing entry
-        setIsAutoSaving(true);
-        updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-      } else if (!hasAutoSaved && hasInteracted && isNewEntry) {
-        // Only create new entry if we haven't auto-saved yet, user has typed, AND this was explicitly marked as a new entry
-        setIsAutoSaving(true);
-        setHasAutoSaved(true); // Set immediately to prevent duplicate creation
-        createEntryMutation.mutate(entryData);
-      }
-    }, 2000); // Auto-save after 2 seconds of no changes
-
-    return () => clearTimeout(autoSave);
-  }, [currentEntry, selectedEntryId, hasAutoSaved, isAutoSaving, hasInteracted, isNewEntry]);
+  const handleSelectEntry = (entry: JournalEntry) => {
+    setSelectedEntryId(entry.id);
+    setShowDeleteConfirm(false);
+  };
 
   const handleDeleteEntry = () => {
     if (selectedEntryId) {
@@ -220,87 +136,162 @@ export default function Journal() {
     }
   };
 
+  const handleUpdateEntry = (entryData: Partial<InsertJournalEntry>) => {
+    if (selectedEntryId) {
+      updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
+    }
+  };
+
+  // Get the selected entry from the fetched data
+  const selectedEntry = entries.find(entry => entry.id === selectedEntryId);
+
+  // Determine which entries to display based on search
   const displayedEntries = searchQuery ? searchResults : entries;
+
+  // Export handlers
+  const exportAsJson = () => {
+    const dataStr = JSON.stringify(entries, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = 'journal-entries.json';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    toast({ title: "Exported as JSON" });
+  };
+
+  const exportAsText = () => {
+    const textContent = entries
+      .map(entry => `${entry.title}\n\n${entry.content.replace(/<[^>]*>/g, '')}\n\n---\n`)
+      .join('\n');
+    
+    const dataUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(textContent);
+    const exportFileDefaultName = 'journal-entries.txt';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    toast({ title: "Exported as text" });
+  };
+
+  const exportAsMarkdown = () => {
+    const markdownContent = entries
+      .map(entry => `# ${entry.title}\n\n${entry.content.replace(/<[^>]*>/g, '')}\n\n---\n`)
+      .join('\n');
+    
+    const dataUri = 'data:text/markdown;charset=utf-8,' + encodeURIComponent(markdownContent);
+    const exportFileDefaultName = 'journal-entries.md';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    toast({ title: "Exported as Markdown" });
+  };
+
+  const exportAsHtml = () => {
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Journal Entries</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; }
+          h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+          .entry { margin-bottom: 40px; }
+          hr { border: none; border-top: 1px solid #eee; margin: 30px 0; }
+        </style>
+      </head>
+      <body>
+        ${entries.map(entry => `
+          <div class="entry">
+            <h1>${entry.title}</h1>
+            ${entry.content}
+            <hr>
+          </div>
+        `).join('')}
+      </body>
+      </html>
+    `;
+    
+    const dataUri = 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlContent);
+    const exportFileDefaultName = 'journal-entries.html';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    toast({ title: "Exported as HTML" });
+  };
 
   return (
     <AuthenticatedLayout>
-      <div className="h-full grid grid-rows-[56px_1fr_44px] bg-gray-50/30" data-testid="journal-app">
+      <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex flex-col">
+      
       {/* Header Row */}
-      <div className="border-b border-gray-200/60 px-4 md:px-8 py-5 bg-white/80 backdrop-blur-sm flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              {!sidebarOpen && (
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  data-testid="button-sidebar-open"
-                  title="Open sidebar"
+      <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200/60 shadow-sm">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mr-3"></div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Journal</h1>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
+            <span>•</span>
+            <span data-testid="text-entry-count">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-3">
+            <Timer />
+            
+            <div className="flex items-center space-x-2">
+              {/* Delete Entry Button */}
+              {selectedEntry && !showDeleteConfirm && (
+                <button 
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="group flex items-center px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                  data-testid="button-delete"
                 >
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                  <svg className="w-4 h-4 text-gray-600 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
                 </button>
               )}
-              <div className="flex items-center space-x-3 text-sm text-gray-700 bg-gray-100/50 px-4 py-2 rounded-lg">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <span className="font-medium">{new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}</span>
-              </div>
-              <Timer />
-            </div>
-
-            <div className="flex items-center space-x-3">
-              {selectedEntryId && (
+              
+              {/* Confirm Delete */}
+              {showDeleteConfirm && (
                 <div className="flex items-center space-x-2">
-                  {!showDeleteConfirm ? (
-                    <button
-                      onClick={() => setShowDeleteConfirm(true)}
-                      className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
-                      data-testid="button-delete-entry"
-                      title="Delete entry"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
-                  ) : (
-                    <div className="flex items-center space-x-1">
-                      <button
-                        onClick={handleDeleteEntry}
-                        disabled={deleteEntryMutation.isPending}
-                        className="p-2 hover:bg-green-100 rounded-lg transition-colors text-green-600 disabled:opacity-50"
-                        data-testid="button-confirm-delete"
-                        title="Confirm delete"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => setShowDeleteConfirm(false)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
-                        data-testid="button-cancel-delete"
-                        title="Cancel delete"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                      </button>
-                    </div>
-                  )}
+                  <span className="text-sm text-gray-600">Delete entry?</span>
+                  <button 
+                    onClick={handleDeleteEntry}
+                    className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                    data-testid="button-confirm-delete"
+                  >
+                    Yes
+                  </button>
+                  <button 
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                    data-testid="button-cancel-delete"
+                  >
+                    No
+                  </button>
                 </div>
               )}
               
-              <button
+              {/* Export Button */}
+              <button 
                 onClick={() => setShowExportModal(true)}
-                className="p-2.5 hover:bg-blue-50 rounded-lg transition-colors group"
+                className="group flex items-center px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                 data-testid="button-export"
-                title="Export entry"
               >
                 <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -308,6 +299,7 @@ export default function Journal() {
               </button>
               
             </div>
+        </div>
       </div>
 
       {/* Workspace Row (Middle) */}
@@ -325,13 +317,19 @@ export default function Journal() {
         />
 
         <div className="flex flex-col min-h-0 flex-1">
-          <Editor
-            entry={currentEntry}
-            onUpdate={(entry) => {
-              setCurrentEntry(entry);
-              setHasInteracted(true); // Mark that user has interacted with the editor
-            }}
-          />
+          {selectedEntry ? (
+            <Editor
+              entry={selectedEntry}
+              onUpdate={handleUpdateEntry}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-gray-500">
+              <div className="text-center">
+                <h3 className="text-lg font-medium mb-2">No entry selected</h3>
+                <p>Create a new entry or select an existing one to start writing</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -339,15 +337,13 @@ export default function Journal() {
       <div className="border-t border-gray-200/60 px-4 md:px-6 py-3 bg-gray-50/20 flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span>Auto-save enabled</span>
           </div>
-          <span data-testid="text-character-count" className="text-gray-600">{currentEntry?.content ? currentEntry.content.replace(/<[^>]*>/g, '').length : 0} characters</span>
+          <span data-testid="text-character-count" className="text-gray-600">{selectedEntry?.content ? selectedEntry.content.replace(/<[^>]*>/g, '').length : 0} characters</span>
         </div>
         <div className="flex items-center space-x-3 text-gray-400">
-          <span>Ctrl+S to save</span>
-          <span>•</span>
-          <span>Ctrl+E to export</span>
+          <span>Changes save automatically</span>
         </div>
       </div>
 
