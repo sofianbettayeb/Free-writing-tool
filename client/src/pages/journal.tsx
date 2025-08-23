@@ -19,6 +19,7 @@ export default function Journal() {
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [isNewEntry, setIsNewEntry] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<Partial<JournalEntry>>({
     title: "",
     content: "",
@@ -142,6 +143,7 @@ export default function Journal() {
     setHasAutoSaved(false);
     setIsAutoSaving(false);
     setHasInteracted(false);
+    setIsNewEntry(true); // Mark that this is explicitly a new entry
     setShowDeleteConfirm(false); // Reset delete confirmation when creating new entry
     setCurrentEntry({ title: "", content: "", wordCount: "0" });
   };
@@ -166,6 +168,7 @@ export default function Journal() {
     setSelectedEntryId(entry.id);
     setHasAutoSaved(true);
     setHasInteracted(false); // Reset interaction flag when switching entries
+    setIsNewEntry(false); // This is not a new entry
     setShowDeleteConfirm(false); // Reset delete confirmation when switching entries
     setCurrentEntry({
       title: entry.title,
@@ -200,8 +203,8 @@ export default function Journal() {
         // Update existing entry
         setIsAutoSaving(true);
         updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
-      } else if (!hasAutoSaved && hasInteracted) {
-        // Only create new entry if we haven't auto-saved yet AND user has actually typed something
+      } else if (!hasAutoSaved && hasInteracted && isNewEntry) {
+        // Only create new entry if we haven't auto-saved yet, user has typed, AND this was explicitly marked as a new entry
         setIsAutoSaving(true);
         setHasAutoSaved(true); // Set immediately to prevent duplicate creation
         createEntryMutation.mutate(entryData);
@@ -209,7 +212,7 @@ export default function Journal() {
     }, 2000); // Auto-save after 2 seconds of no changes
 
     return () => clearTimeout(autoSave);
-  }, [currentEntry, selectedEntryId, hasAutoSaved, isAutoSaving, hasInteracted]);
+  }, [currentEntry, selectedEntryId, hasAutoSaved, isAutoSaving, hasInteracted, isNewEntry]);
 
   const handleDeleteEntry = () => {
     if (selectedEntryId) {
