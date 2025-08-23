@@ -46,11 +46,7 @@ export default function Journal() {
       return response.json();
     },
     onSuccess: (newEntry) => {
-      // Add the new entry to the cache instead of invalidating everything
-      queryClient.setQueryData(["/api/entries"], (oldData: JournalEntry[] | undefined) => {
-        if (!oldData) return [newEntry];
-        return [newEntry, ...oldData];
-      });
+      queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(newEntry.id); // Set the ID so future saves will update instead of create
       setHasAutoSaved(true);
       setIsAutoSaving(false);
@@ -70,14 +66,8 @@ export default function Journal() {
       const response = await apiRequest("PATCH", `/api/entries/${id}`, data);
       return response.json();
     },
-    onSuccess: (updatedEntry) => {
-      // Update the specific entry in the cache instead of invalidating everything
-      queryClient.setQueryData(["/api/entries"], (oldData: JournalEntry[] | undefined) => {
-        if (!oldData) return [];
-        return oldData.map(entry => 
-          entry.id === updatedEntry.id ? updatedEntry : entry
-        );
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setIsAutoSaving(false);
     },
     onError: () => {
@@ -94,12 +84,8 @@ export default function Journal() {
     mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/api/entries/${id}`);
     },
-    onSuccess: (_, deletedId) => {
-      // Remove the specific entry from the cache instead of invalidating everything
-      queryClient.setQueryData(["/api/entries"], (oldData: JournalEntry[] | undefined) => {
-        if (!oldData) return [];
-        return oldData.filter(entry => entry.id !== deletedId);
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(null);
       setHasAutoSaved(false);
       setCurrentEntry({ title: "", content: "", wordCount: "0" });
