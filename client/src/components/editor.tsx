@@ -368,50 +368,48 @@ export function Editor({ entry, onUpdate }: EditorProps) {
             data-testid="input-title"
           />
           
-          {/* Tags Section */}
-          <div className="mt-3 space-y-1.5">
-            {/* Display existing tags */}
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors group cursor-pointer"
-                    data-testid={`tag-${tag}`}
-                  >
-                    <span className="mr-1.5">{tag}</span>
-                    <button
-                      onClick={() => removeTag(tag)}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-lg leading-none"
-                      data-testid={`button-remove-tag-${tag}`}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            
-            {/* Tag input */}
-            <div className="flex items-center">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagInputKeyDown}
-                placeholder="Add tags (press Enter or comma to add)..."
-                className="flex-1 text-sm border border-gray-300 rounded-md px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
-                data-testid="input-tag"
-              />
-              {tagInput.trim() && (
-                <button
-                  onClick={() => addTag(tagInput)}
-                  className="ml-2 px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
-                  data-testid="button-add-tag"
+          {/* Tags Section - Inline Layout */}
+          <div className="mt-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Display existing tags */}
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors group cursor-pointer"
+                  data-testid={`tag-${tag}`}
                 >
-                  Add
-                </button>
-              )}
+                  <span className="mr-1.5">{tag}</span>
+                  <button
+                    onClick={() => removeTag(tag)}
+                    className="text-blue-600 hover:text-blue-800 font-medium text-lg leading-none"
+                    data-testid={`button-remove-tag-${tag}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              
+              {/* Tag input - inline with tags */}
+              <div className="flex items-center min-w-0 flex-1">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagInputKeyDown}
+                  placeholder="Add tags (press Enter or comma to add)..."
+                  className="flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
+                  data-testid="input-tag"
+                />
+                {tagInput.trim() && (
+                  <button
+                    onClick={() => addTag(tagInput)}
+                    className="ml-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors"
+                    data-testid="button-add-tag"
+                  >
+                    Add
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
