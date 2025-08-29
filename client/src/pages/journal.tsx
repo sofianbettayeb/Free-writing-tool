@@ -338,6 +338,20 @@ export default function Journal() {
           onTagClick={handleTagClick}
         />
 
+        {/* Sidebar Toggle Button (when sidebar is closed) */}
+        {!sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 rounded-lg p-2 hover:bg-gray-50 transition-all"
+            data-testid="button-open-sidebar"
+            title="Open sidebar"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        )}
+
         <div className="flex flex-col min-h-0 flex-1">
           {selectedEntry ? (
             <Editor
