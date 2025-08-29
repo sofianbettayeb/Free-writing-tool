@@ -55,7 +55,7 @@ export function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
+    <div className="bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-12 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">

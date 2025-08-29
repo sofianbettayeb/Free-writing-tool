@@ -12,8 +12,11 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const { toast } = useToast();
   const { isAuthenticated, isLoading, user } = useAuth();
 
-  // Redirect to home if not authenticated
+  // Handle authenticated layout setup and redirect
   useEffect(() => {
+    // Add the scroll lock class when authenticated layout mounts
+    document.body.classList.add('app-locked-scroll');
+    
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",
@@ -25,6 +28,11 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       }, 500);
       return;
     }
+
+    // Remove scroll lock class when component unmounts
+    return () => {
+      document.body.classList.remove('app-locked-scroll');
+    };
   }, [isAuthenticated, isLoading, toast]);
 
   if (isLoading) {

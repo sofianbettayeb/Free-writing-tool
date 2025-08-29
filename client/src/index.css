@@ -3,9 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Lock page scrolling completely */
+/* Layout for app - allow scrolling for landing page */
 html, body, #root {
   height: 100%;
+}
+
+/* Lock scrolling only for authenticated app layout */
+.app-locked-scroll {
   overflow: hidden;
 }
 
