@@ -32,6 +32,7 @@ export const journalEntries = pgTable("journal_entries", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   wordCount: varchar("word_count").notNull().default("0"),
+  tags: text("tags").array().default(sql`'{}'::text[]`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -51,6 +52,7 @@ export const insertJournalEntrySchema = createInsertSchema(journalEntries).pick(
   title: true,
   content: true,
   wordCount: true,
+  tags: true,
 });
 
 // Schema for upserting users (for authentication)

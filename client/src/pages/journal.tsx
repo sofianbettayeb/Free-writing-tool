@@ -13,6 +13,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 export default function Journal() {
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -142,11 +143,27 @@ export default function Journal() {
     }
   };
 
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag);
+    setSearchQuery(''); // Clear search when filtering by tag
+  };
+
+  const clearTagFilter = () => {
+    setSelectedTag(null);
+  };
+
   // Get the selected entry from the fetched data
   const selectedEntry = entries.find(entry => entry.id === selectedEntryId);
 
-  // Determine which entries to display based on search
-  const displayedEntries = searchQuery ? searchResults : entries;
+  // Determine which entries to display based on search and tag filtering
+  let displayedEntries = searchQuery ? searchResults : entries;
+  
+  // Apply tag filtering
+  if (selectedTag) {
+    displayedEntries = displayedEntries.filter(entry => 
+      entry.tags && entry.tags.includes(selectedTag)
+    );
+  }
 
   // Export handlers
   const exportAsJson = () => {
@@ -238,7 +255,19 @@ export default function Journal() {
       {/* Action Bar */}
       <div className="flex items-center justify-between px-4 md:px-6 py-3 bg-white/60 backdrop-blur-sm border-b border-gray-200/60">
         <div className="flex items-center space-x-4">
-          <span data-testid="text-entry-count" className="text-sm text-gray-600">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
+          <span data-testid="text-entry-count" className="text-sm text-gray-600">{displayedEntries.length} {displayedEntries.length === 1 ? 'entry' : 'entries'}</span>
+          {selectedTag && (
+            <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+              <span className="text-sm text-blue-800">Filtered by: {selectedTag}</span>
+              <button
+                onClick={clearTagFilter}
+                className="text-blue-600 hover:text-blue-800 font-medium text-lg leading-none"
+                data-testid="button-clear-tag-filter"
+              >
+                ×
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-3">
@@ -306,6 +335,7 @@ export default function Journal() {
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
           isLoading={isLoading}
+          onTagClick={handleTagClick}
         />
 
         <div className="flex flex-col min-h-0 flex-1">

@@ -12,6 +12,7 @@ interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   isLoading: boolean;
+  onTagClick?: (tag: string) => void;
 }
 
 export function Sidebar({
@@ -23,7 +24,8 @@ export function Sidebar({
   onNewEntry,
   isOpen,
   onToggle,
-  isLoading
+  isLoading,
+  onTagClick
 }: SidebarProps) {
   const groupedEntries = entries.reduce((groups, entry) => {
     const date = new Date(entry.createdAt);
@@ -122,6 +124,31 @@ export function Sidebar({
                     <p className="text-sm text-gray-600 line-clamp-2 mb-2">
                       {getPreview(entry.content)}
                     </p>
+                    
+                    {/* Display tags */}
+                    {entry.tags && entry.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {entry.tags.slice(0, 3).map((tag, index) => (
+                          <span
+                            key={index}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent selecting the entry
+                              onTagClick?.(tag);
+                            }}
+                            className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
+                            data-testid={`sidebar-tag-${tag}`}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {entry.tags.length > 3 && (
+                          <span className="text-xs text-gray-500 px-2 py-1">
+                            +{entry.tags.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    
                     <div className="flex items-center text-xs text-gray-400">
                       <span>{getWordCount(entry.content)} words</span>
                       <span className="mx-2">•</span>

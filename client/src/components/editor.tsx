@@ -23,6 +23,8 @@ const FONT_OPTIONS = [
 export function Editor({ entry, onUpdate }: EditorProps) {
   const [selectedFont, setSelectedFont] = useState('inter');
   const [title, setTitle] = useState(entry.title || '');
+  const [tags, setTags] = useState<string[]>(entry.tags || []);
+  const [tagInput, setTagInput] = useState('');
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const editor = useEditor({
@@ -128,7 +130,8 @@ export function Editor({ entry, onUpdate }: EditorProps) {
   // Sync title state with entry prop
   useEffect(() => {
     setTitle(entry.title || '');
-  }, [entry.id, entry.title]); // Update when entry changes
+    setTags(entry.tags || []);
+  }, [entry.id, entry.title, entry.tags]); // Update when entry changes
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -143,6 +146,44 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         title: newTitle,
       });
     }, 1000);
+  };
+
+  const handleTagsChange = (newTags: string[]) => {
+    setTags(newTags);
+    
+    // Debounce tag updates
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+    
+    updateTimeoutRef.current = setTimeout(() => {
+      onUpdate({ tags: newTags });
+    }, 500);
+  };
+
+  const addTag = (tag: string) => {
+    const trimmedTag = tag.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      const newTags = [...tags, trimmedTag];
+      handleTagsChange(newTags);
+    }
+    setTagInput('');
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    const newTags = tags.filter(tag => tag !== tagToRemove);
+    handleTagsChange(newTags);
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      if (tagInput.trim()) {
+        addTag(tagInput);
+      }
+    } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
+      removeTag(tags[tags.length - 1]);
+    }
   };
 
   const toggleBold = useCallback(() => {
@@ -326,6 +367,53 @@ export function Editor({ entry, onUpdate }: EditorProps) {
             className="w-full text-3xl font-bold border-none outline-none placeholder-gray-400/80 text-gray-900 leading-tight focus-ring"
             data-testid="input-title"
           />
+          
+          {/* Tags Section */}
+          <div className="mt-4 space-y-2">
+            {/* Display existing tags */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors group cursor-pointer"
+                    data-testid={`tag-${tag}`}
+                  >
+                    <span className="mr-2">{tag}</span>
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="text-blue-600 hover:text-blue-800 font-medium text-lg leading-none"
+                      data-testid={`button-remove-tag-${tag}`}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            
+            {/* Tag input */}
+            <div className="flex items-center">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagInputKeyDown}
+                placeholder="Add tags (press Enter or comma to add)..."
+                className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
+                data-testid="input-tag"
+              />
+              {tagInput.trim() && (
+                <button
+                  onClick={() => addTag(tagInput)}
+                  className="ml-2 px-3 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+                  data-testid="button-add-tag"
+                >
+                  Add
+                </button>
+              )}
+            </div>
+          </div>
         </div>
         
         {/* Scrollable Content Area - ONLY SCROLLER */}
