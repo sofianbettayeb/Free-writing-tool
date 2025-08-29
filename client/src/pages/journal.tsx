@@ -233,20 +233,12 @@ export default function Journal() {
 
   return (
     <AuthenticatedLayout>
-      <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex flex-col">
+      <div className="h-full bg-gradient-to-br from-gray-50 to-blue-50/30 flex flex-col">
       
-      {/* Header Row */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200/60 shadow-sm">
+      {/* Action Bar */}
+      <div className="flex items-center justify-between px-4 md:px-6 py-3 bg-white/60 backdrop-blur-sm border-b border-gray-200/60">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mr-3"></div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Journal</h1>
-          </div>
-          
-          <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
-            <span>•</span>
-            <span data-testid="text-entry-count">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
-          </div>
+          <span data-testid="text-entry-count" className="text-sm text-gray-600">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
         </div>
 
         <div className="flex items-center space-x-3">

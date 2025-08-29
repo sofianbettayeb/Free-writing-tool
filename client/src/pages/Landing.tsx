@@ -7,7 +7,7 @@ export function Landing() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">
-            Welcome to Journal
+            Welcome to Free writing
           </CardTitle>
           <p className="text-gray-600 mt-2">
             Your personal journaling companion with rich text editing, image support, and secure cloud storage.

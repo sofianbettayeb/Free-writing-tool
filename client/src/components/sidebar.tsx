@@ -58,7 +58,7 @@ export function Sidebar({
     >
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold text-gray-900">Journal</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Free writing</h1>
           <button 
             onClick={onToggle}
             className="p-2 hover:bg-gray-200 rounded-lg transition-colors"

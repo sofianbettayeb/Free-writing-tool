@@ -43,15 +43,15 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
     <div className="min-h-screen bg-gray-50">
       {/* Top navigation bar */}
       <nav className="bg-white shadow-sm border-b px-6 py-3 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
-          <h1 className="text-xl font-semibold text-gray-900">Journal</h1>
-          <span className="text-sm text-gray-500">Your personal writing space</span>
+        <div className="flex items-center space-x-4">
+          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+          <h1 className="text-xl font-semibold text-gray-900">Free writing</h1>
         </div>
         <div className="flex items-center space-x-4">
           {user && (
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <User className="w-4 h-4" />
-              <span>{(user as any).firstName || (user as any).email}</span>
+              <span>{((user as any).firstName || (user as any).email) as string}</span>
             </div>
           )}
           <Button
@@ -68,7 +68,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       
       {/* Main content */}
       <main className="h-[calc(100vh-64px)]">
-        {children as React.ReactNode}
+        {children}
       </main>
     </div>
   );

@@ -1,8 +1,8 @@
-# Journal Application
+# Free writing Application
 
 ## Overview
 
-A modern full-stack journaling application built with React, Express, and PostgreSQL. The application provides a rich text editor with features like font customization, export functionality, and a timer for focused writing sessions. Users can create, edit, search, and organize their journal entries with an intuitive sidebar interface.
+A modern full-stack writing application called "Free writing" built with React, Express, and PostgreSQL. The application provides a rich text editor with features like font customization, export functionality, and a timer for focused writing sessions. Users can create, edit, search, and organize their journal entries with an intuitive sidebar interface.
 
 ## User Preferences
 
