@@ -50,10 +50,10 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top navigation bar */}
-      <nav className="bg-white shadow-sm border-b px-6 py-3 flex justify-between items-center">
+      <nav className="bg-white shadow-sm border-b px-4 py-2 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
-          <h1 className="text-xl font-semibold text-gray-900">Free writing</h1>
+          <h1 className="text-lg font-semibold text-gray-900">Free writing</h1>
         </div>
         <div className="flex items-center space-x-4">
           {user && (
@@ -75,7 +75,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
       </nav>
       
       {/* Main content */}
-      <main className="h-[calc(100vh-64px)]">
+      <main className="h-[calc(100vh-48px)]">
         {children}
       </main>
     </div>

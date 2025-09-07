@@ -253,7 +253,7 @@ export default function Journal() {
       <div className="h-full bg-gradient-to-br from-gray-50 to-blue-50/30 flex flex-col">
       
       {/* Action Bar */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-3 bg-white/60 backdrop-blur-sm border-b border-gray-200/60">
+      <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-white/60 backdrop-blur-sm border-b border-gray-200/60">
         <div className="flex items-center space-x-4">
           <span data-testid="text-entry-count" className="text-sm text-gray-600">{displayedEntries.length} {displayedEntries.length === 1 ? 'entry' : 'entries'}</span>
           {selectedTag && (
@@ -370,7 +370,7 @@ export default function Journal() {
       </div>
 
       {/* Footer Row */}
-      <div className="border-t border-gray-200/60 px-4 md:px-6 py-3 bg-gray-50/20 flex items-center justify-between text-sm text-gray-500">
+      <div className="border-t border-gray-200/60 px-4 md:px-6 py-2 bg-gray-50/20 flex items-center justify-between text-sm text-gray-500">
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>

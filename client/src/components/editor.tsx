@@ -250,12 +250,12 @@ export function Editor({ entry, onUpdate }: EditorProps) {
   return (
     <div className="flex flex-col min-h-0 h-full">
       {/* Formatting Toolbar */}
-      <div className="border-b border-gray-200/60 px-6 py-4 bg-gray-50/30">
+      <div className="border-b border-gray-200/60 px-4 py-2 bg-gray-50/30">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             <button
               onClick={toggleBold}
-              className={`p-2 hover:bg-gray-100 rounded transition-colors ${
+              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
                 editor.isActive('bold') ? 'bg-gray-200' : ''
               }`}
               title="Bold (Ctrl+B)"
@@ -268,7 +268,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
             
             <button
               onClick={toggleItalic}
-              className={`p-2 hover:bg-gray-100 rounded transition-colors ${
+              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
                 editor.isActive('italic') ? 'bg-gray-200' : ''
               }`}
               title="Italic (Ctrl+I)"
@@ -279,11 +279,11 @@ export function Editor({ entry, onUpdate }: EditorProps) {
               </svg>
             </button>
 
-            <div className="w-px h-6 bg-gray-300/60 mx-3"></div>
+            <div className="w-px h-4 bg-gray-300/60 mx-2"></div>
 
             <button
               onClick={toggleBulletList}
-              className={`p-2 hover:bg-gray-100 rounded transition-colors ${
+              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
                 editor.isActive('bulletList') ? 'bg-gray-200' : ''
               }`}
               title="Bullet List"
@@ -296,7 +296,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
 
             <button
               onClick={toggleOrderedList}
-              className={`p-2 hover:bg-gray-100 rounded transition-colors ${
+              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
                 editor.isActive('orderedList') ? 'bg-gray-200' : ''
               }`}
               title="Numbered List"
@@ -313,7 +313,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
 
             <button
               onClick={insertLink}
-              className="p-2 hover:bg-gray-100 rounded transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors"
               title="Insert Link (Ctrl+K)"
               data-testid="button-link"
             >
@@ -324,7 +324,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
 
             <button
               onClick={insertImage}
-              className="p-2 hover:bg-gray-100 rounded transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors"
               title="Insert Image"
               data-testid="button-image"
             >
@@ -358,7 +358,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       {/* Editor Area - Fixed Layout */}
       <div className="flex-1 flex flex-col bg-white min-h-0">
         {/* Fixed Title Input */}
-        <div className="border-b border-gray-100 px-4 md:px-6 py-3 flex-shrink-0">
+        <div className="border-b border-gray-100 px-4 md:px-6 py-2 flex-shrink-0">
           <input
             type="text"
             value={title}
