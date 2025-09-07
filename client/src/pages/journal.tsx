@@ -352,12 +352,11 @@ export default function Journal() {
           </button>
         )}
 
-        <div className={`flex flex-col min-h-0 flex-1 ${!sidebarOpen ? 'ml-16' : ''}`}>
+        <div className="flex flex-col min-h-0 flex-1">
           {selectedEntry ? (
             <Editor
               entry={selectedEntry}
               onUpdate={handleUpdateEntry}
-              sidebarOpen={sidebarOpen}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center text-gray-500">
