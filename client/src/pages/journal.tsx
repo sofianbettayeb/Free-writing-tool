@@ -352,7 +352,7 @@ export default function Journal() {
           </button>
         )}
 
-        <div className={`flex flex-col min-h-0 flex-1 ${!sidebarOpen ? 'pl-16' : ''}`}>
+        <div className={`flex flex-col min-h-0 flex-1 ${!sidebarOpen ? 'ml-16' : ''}`}>
           {selectedEntry ? (
             <Editor
               entry={selectedEntry}
