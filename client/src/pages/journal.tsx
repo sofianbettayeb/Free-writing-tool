@@ -256,9 +256,18 @@ export default function Journal() {
       <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-white/60 backdrop-blur-sm border-b border-gray-200/60">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            {!sidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                data-testid="button-open-sidebar-menu"
+                title="Open sidebar"
+              >
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            )}
             <span data-testid="text-entry-count" className="text-sm text-gray-600">{displayedEntries.length} {displayedEntries.length === 1 ? 'entry' : 'entries'}</span>
           </div>
           {selectedTag && (
@@ -343,19 +352,6 @@ export default function Journal() {
           onTagClick={handleTagClick}
         />
 
-        {/* Sidebar Toggle Button (when sidebar is closed) */}
-        {!sidebarOpen && (
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 rounded-lg p-2 hover:bg-gray-50 transition-all"
-            data-testid="button-open-sidebar"
-            title="Open sidebar"
-          >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        )}
 
         <div className="flex flex-col min-h-0 flex-1">
           {selectedEntry ? (
