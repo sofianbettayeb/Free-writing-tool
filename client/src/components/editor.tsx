@@ -415,15 +415,20 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
         
         {/* Scrollable Content Area - ONLY SCROLLER */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-8 py-6">
-          <EditorContent
-            editor={editor}
-            className="w-full"
-            style={{
-              fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif'
-            }}
-            data-testid="editor-content"
-          />
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 md:px-12 py-8">
+          <div className="max-w-4xl mx-auto">
+            <EditorContent
+              editor={editor}
+              className="w-full prose prose-lg max-w-none focus-within:outline-none"
+              style={{
+                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif',
+                fontSize: '18px',
+                lineHeight: '1.75',
+                color: '#1f2937'
+              }}
+              data-testid="editor-content"
+            />
+          </div>
         </div>
       </div>
 

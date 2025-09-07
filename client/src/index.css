@@ -290,3 +290,54 @@ html, body, #root {
   ring-color: hsl(220, 91.2281%, 54.7059%);
   ring-opacity: 0.5;
 }
+
+/* Enhanced editor focus styling */
+.ProseMirror {
+  outline: none !important;
+  caret-color: #3b82f6;
+  min-height: 400px;
+}
+
+.ProseMirror p {
+  margin: 1.2rem 0;
+}
+
+.ProseMirror p:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.ProseMirror h1:first-child, .ProseMirror h2:first-child, .ProseMirror h3:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror ul, .ProseMirror ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.ProseMirror .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9ca3af;
+  pointer-events: none;
+  height: 0;
+}
