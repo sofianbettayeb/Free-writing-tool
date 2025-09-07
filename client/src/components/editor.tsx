@@ -9,6 +9,7 @@ import { uploadImage, getImageFromClipboard, getImagesFromDrop, isImageFile } fr
 interface EditorProps {
   entry: JournalEntry;
   onUpdate: (data: Partial<InsertJournalEntry>) => void;
+  sidebarOpen?: boolean;
 }
 
 const FONT_OPTIONS = [
@@ -20,7 +21,7 @@ const FONT_OPTIONS = [
   { value: 'georgia', label: 'Georgia', family: 'Georgia, serif' },
 ];
 
-export function Editor({ entry, onUpdate }: EditorProps) {
+export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
   const [selectedFont, setSelectedFont] = useState('inter');
   const [title, setTitle] = useState(entry.title || '');
   const [tags, setTags] = useState<string[]>(entry.tags || []);
@@ -358,7 +359,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
       {/* Editor Area - Fixed Layout */}
       <div className="flex-1 flex flex-col bg-white min-h-0">
         {/* Fixed Title Input */}
-        <div className="border-b border-gray-100 px-6 md:px-12 py-2 flex-shrink-0">
+        <div className={`border-b border-gray-100 py-2 flex-shrink-0 ${sidebarOpen ? 'px-4 md:px-8' : 'px-6 md:px-12'}`}>
           <div className="max-w-4xl mx-auto">
             <input
               type="text"
@@ -419,7 +420,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
         
         {/* Scrollable Content Area - ONLY SCROLLER */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-6 md:px-12 py-8">
+        <div className={`flex-1 min-h-0 overflow-y-auto py-8 ${sidebarOpen ? 'px-4 md:px-8' : 'px-6 md:px-12'}`}>
           <div className="max-w-4xl mx-auto">
             <EditorContent
               editor={editor}
