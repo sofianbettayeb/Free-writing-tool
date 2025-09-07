@@ -20,7 +20,13 @@ const FONT_OPTIONS = [
   { value: 'georgia', label: 'Georgia', family: 'Georgia, serif' },
 ];
 
-export function Editor({ entry, onUpdate }: EditorProps) {
+interface EditorProps {
+  entry: JournalEntry;
+  onUpdate: (data: Partial<InsertJournalEntry>) => void;
+  sidebarOpen?: boolean;
+}
+
+export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
   const [selectedFont, setSelectedFont] = useState('inter');
   const [title, setTitle] = useState(entry.title || '');
   const [tags, setTags] = useState<string[]>(entry.tags || []);
@@ -415,7 +421,7 @@ export function Editor({ entry, onUpdate }: EditorProps) {
         </div>
         
         {/* Scrollable Content Area - ONLY SCROLLER */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-6 md:px-12 py-8">
+        <div className={`flex-1 min-h-0 overflow-y-auto py-8 ${sidebarOpen ? 'px-6 md:px-12' : 'pr-6 md:pr-12'}`}>
           <div className="max-w-4xl mx-auto">
             <EditorContent
               editor={editor}

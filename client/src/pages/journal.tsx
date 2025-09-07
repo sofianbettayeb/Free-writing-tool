@@ -357,6 +357,7 @@ export default function Journal() {
             <Editor
               entry={selectedEntry}
               onUpdate={handleUpdateEntry}
+              sidebarOpen={sidebarOpen}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center text-gray-500">
