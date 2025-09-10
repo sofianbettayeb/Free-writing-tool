@@ -2,6 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
+import { DOMSerializer } from '@tiptap/pm/model';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { JournalEntry, InsertJournalEntry } from '@shared/schema';
 import { uploadImage, getImageFromClipboard, getImagesFromDrop, isImageFile } from '@/lib/imageUpload';
@@ -113,6 +114,95 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
           }
           
           return false;
+        },
+        copy: (view, event) => {
+          const { state } = view;
+          const { selection } = state;
+          
+          // Only handle if there's a selection
+          if (selection.empty) return false;
+          
+          // Get the selected content
+          const slice = selection.content();
+          const fragment = slice.content;
+          
+          // Check if selection contains images
+          let hasImages = false;
+          const imageUrls: string[] = [];
+          
+          fragment.descendants((node) => {
+            if (node.type.name === 'image') {
+              hasImages = true;
+              imageUrls.push(node.attrs.src);
+            }
+          });
+          
+          if (!hasImages) return false; // Let default behavior handle text-only
+          
+          event.preventDefault();
+          
+          try {
+            // Get HTML content of selection
+            const div = document.createElement('div');
+            const dom = DOMSerializer.fromSchema(state.schema).serializeFragment(fragment);
+            div.appendChild(dom);
+            const htmlContent = div.innerHTML;
+            
+            // Get plain text content
+            const textContent = div.textContent || '';
+            
+            // Handle async clipboard operations in background
+            const copyWithImages = async () => {
+              try {
+                const clipboardItems = [];
+                
+                // Add HTML and text to clipboard
+                clipboardItems.push(
+                  new ClipboardItem({
+                    'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                    'text/plain': new Blob([textContent], { type: 'text/plain' })
+                  })
+                );
+                
+                // For each image, try to fetch and add to clipboard
+                for (const imageUrl of imageUrls) {
+                  try {
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    clipboardItems.push(new ClipboardItem({
+                      [blob.type]: blob
+                    }));
+                  } catch (error) {
+                    // If we can't fetch the image, continue with others
+                    console.warn('Could not fetch image for clipboard:', imageUrl);
+                  }
+                }
+                
+                // Write to clipboard
+                await navigator.clipboard.write(clipboardItems);
+              } catch (error) {
+                console.warn('Failed to copy content with images:', error);
+                // Fallback: put HTML in clipboard the traditional way
+                event.clipboardData?.setData('text/html', htmlContent);
+                event.clipboardData?.setData('text/plain', textContent);
+              }
+            };
+            
+            // Start async operation
+            copyWithImages();
+            
+            // Also set the data synchronously as fallback
+            if (event.clipboardData) {
+              event.clipboardData.setData('text/html', htmlContent);
+              event.clipboardData.setData('text/plain', textContent);
+            }
+            
+            return true;
+            
+          } catch (error) {
+            console.warn('Failed to handle copy event:', error);
+            return false; // Fall back to default behavior
+          }
         },
       },
     },
