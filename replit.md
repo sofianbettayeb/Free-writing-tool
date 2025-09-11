@@ -70,3 +70,15 @@ Preferred communication style: Simple, everyday language.
 ### Cloud Services
 - **Neon Database**: Managed PostgreSQL database service
 - **Replit Integration**: Development environment optimizations
+
+## Recent Changes
+
+### December 2024
+- Complete tag-based filtering system implemented with clickable tags and clear filter options
+- SEO-optimized landing page created targeting "free writing tools" keywords with comprehensive optimization
+- UI significantly optimized: compact header/toolbar design providing more writing space
+- Fixed scrolling issues on landing page with conditional CSS overflow management
+- Dynamic margin system implemented: smaller margins when sidebar open, larger when closed
+- Enhanced copy-paste functionality: supports copying both text and images together for rich content sharing
+- Menu icon integration: Added hamburger menu in action bar to open/close sidebar, removed floating button
+- Comprehensive SEO optimizations: favicon, meta tags, Open Graph, Twitter Cards, structured data, keyword optimization
