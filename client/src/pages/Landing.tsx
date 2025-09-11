@@ -7,18 +7,8 @@ import appIllustration from "@assets/generated_images/Writing_app_interface_illu
 
 export function Landing() {
   useEffect(() => {
-    // SEO optimizations
-    document.title = "Free Writing Tool - Focus, Organize & Export Your Ideas Instantly";
-    
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Discover the best free writing tool for focused writing. Organize ideas with smart tags and export directly to ChatGPT. Start writing distraction-free today.');
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = 'Discover the best free writing tool for focused writing. Organize ideas with smart tags and export directly to ChatGPT. Start writing distraction-free today.';
-      document.head.appendChild(meta);
-    }
+    // SEO optimizations - now handled in index.html for better performance
+    document.title = "Free Writing Tools - Focus, Organize & Export Your Ideas";
 
     // Open Graph tags for social sharing
     const ogTitle = document.querySelector('meta[property="og:title"]') || document.createElement('meta');
@@ -32,7 +22,7 @@ export function Landing() {
     if (!document.querySelector('meta[property="og:description"]')) document.head.appendChild(ogDescription);
 
     return () => {
-      document.title = "Free writing";
+      document.title = "Free Writing Tools";
     };
   }, []);
 
@@ -64,18 +54,18 @@ export function Landing() {
             <div className="space-y-4">
               <Badge variant="secondary" className="text-blue-700 bg-blue-100 border-blue-200">
                 <Zap className="w-3 h-3 mr-1" />
-                100% Free Writing Tool
+                100% Free Writing Tools
               </Badge>
               
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                Focus on Writing.
-                <span className="text-blue-600 block">Organize with Tags.</span>
-                <span className="text-gray-700 block text-3xl lg:text-4xl">Export to ChatGPT.</span>
+                Free Writing Tools for
+                <span className="text-blue-600 block">Focused Content Creation</span>
+                <span className="text-gray-700 block text-3xl lg:text-4xl">With Smart Organization</span>
               </h1>
               
               <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
-                The ultimate free writing tool for writers who want to focus on their ideas. 
-                Organize thoughts with smart tags and export directly to ChatGPT for AI assistance.
+                Discover the best free writing tools for writers and content creators. 
+                Organize thoughts with smart tags, rich text editing, and export directly to ChatGPT for AI assistance.
               </p>
             </div>
 
@@ -139,11 +129,11 @@ export function Landing() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center space-y-4 mb-16">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                Why Choose Our Free Writing Tool?
+                Why Choose Our Free Writing Tools?
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Built for writers who value simplicity, organization, and seamless AI integration. 
-                Everything you need to capture and develop your ideas.
+                Our free writing tools are built for writers who value simplicity, organization, and seamless AI integration. 
+                Everything you need to capture and develop your ideas with professional writing tools.
               </p>
             </div>
 
@@ -173,10 +163,10 @@ export function Landing() {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-6">
             <h2 className="text-3xl lg:text-4xl font-bold text-white">
-              Ready to Transform Your Writing?
+              Ready to Try Our Free Writing Tools?
             </h2>
             <p className="text-xl text-blue-100">
-              Join thousands of writers using the best free writing tool for focused, organized writing.
+              Join thousands of writers using the best free writing tools for focused, organized content creation.
             </p>
             <Button 
               onClick={() => window.location.href = '/api/login'}
@@ -195,7 +185,7 @@ export function Landing() {
       <div className="bg-gray-50 py-8 border-t border-gray-200">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-600">
-            <strong>Free writing</strong> - The ultimate free writing tool for focused writers
+            <strong>Free Writing Tools</strong> - The ultimate free writing tools for focused writers and content creators
           </p>
         </div>
       </div>
