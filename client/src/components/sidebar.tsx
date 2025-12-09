@@ -27,7 +27,10 @@ export function Sidebar({
   isLoading,
   onTagClick
 }: SidebarProps) {
-  const groupedEntries = entries.reduce((groups, entry) => {
+  // Ensure entries is always an array
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  
+  const groupedEntries = safeEntries.reduce((groups, entry) => {
     const date = new Date(entry.createdAt);
     let key = 'older';
     

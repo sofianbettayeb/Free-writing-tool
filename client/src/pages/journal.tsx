@@ -25,9 +25,18 @@ export default function Journal() {
     queryKey: ["/api/entries"],
   });
 
-  // Search entries
+  // Search entries - use query parameter to handle special characters like "/"
   const { data: searchResults = [] } = useQuery<JournalEntry[]>({
     queryKey: ["/api/entries/search", searchQuery],
+    queryFn: async () => {
+      const res = await fetch(`/api/entries/search?q=${encodeURIComponent(searchQuery)}`, {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    },
     enabled: searchQuery.length > 0,
   });
 

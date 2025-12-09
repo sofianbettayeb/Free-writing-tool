@@ -86,11 +86,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search journal entries (user-aware)
-  app.get("/api/entries/search/:query", isAuthenticated, async (req: any, res) => {
+  // Search journal entries (user-aware) - using query parameter to handle special characters
+  app.get("/api/entries/search", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const entries = await storage.searchJournalEntries(req.params.query, userId);
+      const query = (req.query.q as string) || '';
+      if (!query.trim()) {
+        // Return empty array for empty search
+        return res.json([]);
+      }
+      const entries = await storage.searchJournalEntries(query, userId);
       res.json(entries);
     } catch (error) {
       res.status(500).json({ message: "Search failed" });
