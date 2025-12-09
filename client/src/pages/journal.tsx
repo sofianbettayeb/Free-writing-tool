@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { JournalEntry, InsertJournalEntry } from "@shared/schema";
 import { AuthenticatedLayout } from "@/components/AuthenticatedLayout";
@@ -17,8 +18,35 @@ export default function Journal() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const { toast } = useToast();
+
+  // Keyboard shortcut for opening shortcuts popup (Cmd/Ctrl + /)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        setShowShortcuts(prev => !prev);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const KEYBOARD_SHORTCUTS = [
+    { keys: ['Mod', 'B'], action: 'Bold' },
+    { keys: ['Mod', 'I'], action: 'Italic' },
+    { keys: ['Mod', 'U'], action: 'Underline' },
+    { keys: ['Mod', 'Shift', 'S'], action: 'Strikethrough' },
+    { keys: ['Mod', 'E'], action: 'Code' },
+    { keys: ['Mod', 'Shift', '8'], action: 'Bullet List' },
+    { keys: ['Mod', 'Shift', '7'], action: 'Numbered List' },
+    { keys: ['Mod', 'Z'], action: 'Undo' },
+    { keys: ['Mod', 'Shift', 'Z'], action: 'Redo' },
+    { keys: ['Mod', '/'], action: 'Show Shortcuts' },
+  ];
 
   // Fetch all entries
   const { data: entries = [], isLoading } = useQuery<JournalEntry[]>({
@@ -389,7 +417,17 @@ export default function Journal() {
           </div>
           <span data-testid="text-character-count" className="text-gray-600">{selectedEntry?.content ? selectedEntry.content.replace(/<[^>]*>/g, '').length : 0} characters</span>
         </div>
-        <div className="flex items-center space-x-3 text-gray-400">
+        <div className="flex items-center space-x-4 text-gray-400">
+          <button
+            onClick={() => setShowShortcuts(true)}
+            className="text-xs hover:text-gray-600 transition-colors flex items-center gap-1"
+            data-testid="button-show-shortcuts"
+          >
+            <span>Press</span>
+            <kbd className="px-1.5 py-0.5 bg-gray-200 rounded text-[10px] font-mono">{navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl'}+/</kbd>
+            <span>for shortcuts</span>
+          </button>
+          <span className="text-gray-300">|</span>
           <span>Changes save automatically</span>
         </div>
       </div>
@@ -400,6 +438,45 @@ export default function Journal() {
         entries={entries}
         selectedEntryId={selectedEntryId}
       />
+
+      {/* Shortcuts Dialog */}
+      <Dialog open={showShortcuts} onOpenChange={setShowShortcuts}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+              </svg>
+              Keyboard Shortcuts
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1 max-h-80 overflow-y-auto">
+            {KEYBOARD_SHORTCUTS.map((shortcut, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center py-2 px-2 hover:bg-gray-50 rounded"
+              >
+                <span className="text-sm text-gray-700">{shortcut.action}</span>
+                <div className="flex items-center gap-1">
+                  {shortcut.keys.map((key, keyIndex) => (
+                    <span key={keyIndex}>
+                      <kbd className="px-2 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-mono text-gray-600">
+                        {key === 'Mod' ? (navigator.platform.includes('Mac') ? '⌘' : 'Ctrl') : key}
+                      </kbd>
+                      {keyIndex < shortcut.keys.length - 1 && (
+                        <span className="text-gray-400 mx-0.5">+</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-gray-400 text-center pt-2 border-t">
+            Press <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Esc</kbd> to close
+          </div>
+        </DialogContent>
+      </Dialog>
       </div>
     </AuthenticatedLayout>
   );
