@@ -82,3 +82,7 @@ Preferred communication style: Simple, everyday language.
 - Enhanced copy-paste functionality: supports copying both text and images together for rich content sharing
 - Menu icon integration: Added hamburger menu in action bar to open/close sidebar, removed floating button
 - Comprehensive SEO optimizations: favicon, meta tags, Open Graph, Twitter Cards, structured data, keyword optimization
+- Keyboard shortcuts system: All formatting options accessible via standard shortcuts (Cmd/Ctrl+B for bold, Cmd/Ctrl+I for italic, etc.)
+- Shortcuts popup: Press Cmd/Ctrl+/ to view all available keyboard shortcuts
+- Added toolbar buttons: Underline (Cmd/Ctrl+U), Strikethrough (Cmd/Ctrl+Shift+S), and Code (Cmd/Ctrl+E)
+- Footer hint for discoverability: Shows users how to access the shortcuts popup
