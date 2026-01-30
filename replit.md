@@ -86,3 +86,13 @@ Preferred communication style: Simple, everyday language.
 - Shortcuts popup: Press Cmd/Ctrl+/ to view all available keyboard shortcuts
 - Added toolbar buttons: Underline (Cmd/Ctrl+U), Strikethrough (Cmd/Ctrl+Shift+S), and Code (Cmd/Ctrl+E)
 - Footer hint for discoverability: Shows users how to access the shortcuts popup
+
+### January 2026
+- Offline support implemented: App works without internet connection
+  - IndexedDB storage for caching entries locally (client/src/lib/offlineStorage.ts)
+  - Service worker for caching static assets (client/public/sw.js)
+  - Offline sync hook (client/src/hooks/useOfflineSync.ts) for detecting online/offline status
+  - Pending changes queue for syncing when back online (create, update, delete actions)
+  - Online/offline status indicator in footer with green/amber dot
+  - Automatic sync of entries to local storage when fetched from server
+  - Fallback to offline entries when network request fails

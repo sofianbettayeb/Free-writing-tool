@@ -10,6 +10,8 @@ import { ExportModal } from "@/components/export-modal";
 import { Timer } from "@/components/timer";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Journal() {
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
@@ -21,6 +23,8 @@ export default function Journal() {
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { isOnline, isSyncing, hasPendingChanges, syncNow, createEntry: createOfflineEntry, updateEntry: updateOfflineEntry, deleteEntry: deleteOfflineEntry, saveEntry: saveOfflineEntry, getOfflineEntries } = useOfflineSync(user?.id);
 
   // Keyboard shortcut for opening shortcuts popup (Cmd/Ctrl + /)
   useEffect(() => {
@@ -48,10 +52,30 @@ export default function Journal() {
     { keys: ['Mod', '/'], action: 'Show Shortcuts' },
   ];
 
-  // Fetch all entries
+  // Fetch all entries with offline fallback
   const { data: entries = [], isLoading } = useQuery<JournalEntry[]>({
     queryKey: ["/api/entries"],
+    queryFn: async () => {
+      if (!navigator.onLine && user?.id) {
+        return getOfflineEntries(user.id);
+      }
+      const response = await fetch('/api/entries', { credentials: 'include' });
+      if (!response.ok) {
+        if (user?.id) {
+          return getOfflineEntries(user.id);
+        }
+        throw new Error('Failed to fetch entries');
+      }
+      return response.json();
+    },
   });
+
+  // Sync entries to offline storage when fetched from server
+  useEffect(() => {
+    if (entries.length > 0 && navigator.onLine) {
+      entries.forEach(entry => saveOfflineEntry(entry));
+    }
+  }, [entries, saveOfflineEntry]);
 
   // Search entries - use query parameter to handle special characters like "/"
   const { data: searchResults = [] } = useQuery<JournalEntry[]>({
@@ -68,15 +92,26 @@ export default function Journal() {
     enabled: searchQuery.length > 0,
   });
 
-  // Create entry mutation
+  // Create entry mutation with offline support
   const createEntryMutation = useMutation({
     mutationFn: async (entryData: InsertJournalEntry) => {
+      if (!navigator.onLine) {
+        const offlineEntry = await createOfflineEntry(entryData);
+        if (offlineEntry) {
+          return offlineEntry;
+        }
+      }
       const response = await apiRequest("POST", "/api/entries", entryData);
-      return response.json();
+      const newEntry = await response.json();
+      await saveOfflineEntry(newEntry);
+      return newEntry;
     },
     onSuccess: (newEntry) => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(newEntry.id);
+      if (!navigator.onLine) {
+        toast({ title: "Entry saved offline", description: "Will sync when back online" });
+      }
     },
     onError: (error) => {
       if (isUnauthorizedError(error as Error)) {
@@ -97,11 +132,17 @@ export default function Journal() {
     },
   });
 
-  // Update entry mutation
+  // Update entry mutation with offline support
   const updateEntryMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<InsertJournalEntry> }) => {
+      if (!navigator.onLine) {
+        await updateOfflineEntry(id, data);
+        return { id, ...data };
+      }
       const response = await apiRequest("PATCH", `/api/entries/${id}`, data);
-      return response.json();
+      const result = await response.json();
+      await saveOfflineEntry(result);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
@@ -125,16 +166,20 @@ export default function Journal() {
     },
   });
 
-  // Delete entry mutation
+  // Delete entry mutation with offline support
   const deleteEntryMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (!navigator.onLine) {
+        await deleteOfflineEntry(id);
+        return;
+      }
       await apiRequest("DELETE", `/api/entries/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/entries"] });
       setSelectedEntryId(null);
       setShowDeleteConfirm(false);
-      toast({ title: "Entry deleted successfully" });
+      toast({ title: navigator.onLine ? "Entry deleted successfully" : "Entry will be deleted when back online" });
     },
     onError: (error) => {
       if (isUnauthorizedError(error as Error)) {
@@ -419,7 +464,29 @@ export default function Journal() {
 
       {/* Footer Row - Simplified */}
       <div className="border-t border-stone-200 px-4 md:px-6 py-2 bg-white flex items-center justify-between text-sm text-stone-500">
-        <span data-testid="text-character-count">{selectedEntry?.content ? selectedEntry.content.replace(/<[^>]*>/g, '').length : 0} chars</span>
+        <div className="flex items-center gap-3">
+          <span data-testid="text-character-count">{selectedEntry?.content ? selectedEntry.content.replace(/<[^>]*>/g, '').length : 0} chars</span>
+          {/* Online/Offline Status Indicator */}
+          <div className="flex items-center gap-1.5">
+            <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-amber-500'}`} />
+            <span className="text-xs">
+              {!isOnline ? (
+                'Offline - changes saved locally'
+              ) : isSyncing ? (
+                'Syncing...'
+              ) : hasPendingChanges ? (
+                <button 
+                  onClick={syncNow}
+                  className="hover:text-stone-700 underline"
+                >
+                  Sync pending changes
+                </button>
+              ) : (
+                'Online'
+              )}
+            </span>
+          </div>
+        </div>
         <button
           onClick={() => setShowShortcuts(true)}
           className="text-xs hover:text-stone-700 transition-colors flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-1 rounded px-1"
