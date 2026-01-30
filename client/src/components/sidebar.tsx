@@ -55,108 +55,116 @@ export function Sidebar({
   };
 
   return (
-    <div 
-      className={`bg-gray-50 border-r border-gray-200 flex flex-col min-h-0 transition-all duration-300 ${
-        isOpen ? 'w-80 overflow-y-auto' : 'w-0 overflow-hidden'
+    <div
+      className={`bg-white border-r border-stone-200 flex flex-col min-h-0 transition-all duration-200 ${
+        isOpen ? 'w-72 overflow-y-auto' : 'w-0 overflow-hidden'
       }`}
       data-testid="sidebar"
     >
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold text-gray-900">Free writing</h1>
-          <button 
+      <div className="p-4 border-b border-stone-100">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-base font-medium text-stone-900">Entries</h1>
+          <button
             onClick={onToggle}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-200 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
             data-testid="button-sidebar-toggle"
+            aria-label="Close sidebar"
+            aria-expanded={isOpen}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
             </svg>
           </button>
         </div>
         
         <div className="relative">
-          <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
-          <input 
-            type="text" 
-            placeholder="Search entries..." 
+          <input
+            type="text"
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-9 pr-3 py-1.5 border border-stone-200 rounded text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500"
             data-testid="input-search"
+            aria-label="Search entries"
           />
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="p-4 text-center text-gray-500">Loading entries...</div>
+          <div className="p-4 text-center text-stone-400 text-sm">Loading...</div>
         ) : entries.length === 0 && !searchQuery ? (
-          <div className="p-4 text-center text-gray-500">No entries yet. Create your first entry!</div>
+          <div className="p-4 text-center text-stone-400 text-sm">No entries yet</div>
         ) : entries.length === 0 && searchQuery ? (
-          <div className="p-4 text-center text-gray-500">No entries found for "{searchQuery}"</div>
+          <div className="p-4 text-center text-stone-400 text-sm">No results</div>
         ) : (
-          <div className="p-4">
+          <div className="p-3">
             {Object.entries(groupedEntries).map(([group, groupEntries]) => (
               <div key={group}>
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
-                  {group === 'today' ? 'Today' : group === 'yesterday' ? 'Yesterday' : 'Older'}
+                <div className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-2 px-1">
+                  {group === 'today' ? 'Today' : group === 'yesterday' ? 'Yesterday' : 'Earlier'}
                 </div>
                 
                 {groupEntries.map((entry) => (
                   <div
                     key={entry.id}
                     onClick={() => onSelectEntry(entry)}
-                    className={`mb-4 p-3 rounded-lg border cursor-pointer transition-all ${
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onSelectEntry(entry);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-selected={selectedEntryId === entry.id}
+                    aria-label={`Entry: ${entry.title || 'Untitled'}`}
+                    className={`mb-2 p-2.5 rounded cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 ${
                       selectedEntryId === entry.id
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'bg-white border-gray-200 hover:shadow-sm'
+                        ? 'bg-stone-100'
+                        : 'hover:bg-stone-50'
                     }`}
                     data-testid={`card-entry-${entry.id}`}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-sm font-medium text-gray-900 truncate">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-sm font-medium text-stone-900 truncate" title={entry.title || 'Untitled'}>
                         {entry.title || 'Untitled'}
                       </span>
-                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                      <span className="text-xs text-stone-400 ml-2 flex-shrink-0">
                         {format(new Date(entry.createdAt), 'h:mm a')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                    <p className="text-xs text-stone-500 line-clamp-2">
                       {getPreview(entry.content)}
                     </p>
-                    
-                    {/* Display tags */}
+
+                    {/* Tags - simplified */}
                     {entry.tags && entry.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {entry.tags.slice(0, 3).map((tag, index) => (
-                          <span
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {entry.tags.slice(0, 2).map((tag, index) => (
+                          <button
                             key={index}
                             onClick={(e) => {
-                              e.stopPropagation(); // Prevent selecting the entry
+                              e.stopPropagation();
                               onTagClick?.(tag);
                             }}
-                            className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
+                            className="px-1.5 py-0.5 text-xs bg-stone-100 text-stone-600 rounded hover:bg-stone-200 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-500"
                             data-testid={`sidebar-tag-${tag}`}
+                            aria-label={`Filter by tag: ${tag}`}
                           >
                             {tag}
-                          </span>
+                          </button>
                         ))}
-                        {entry.tags.length > 3 && (
-                          <span className="text-xs text-gray-500 px-2 py-1">
-                            +{entry.tags.length - 3} more
+                        {entry.tags.length > 2 && (
+                          <span className="text-xs text-stone-400 px-1">
+                            +{entry.tags.length - 2}
                           </span>
                         )}
                       </div>
                     )}
-                    
-                    <div className="flex items-center text-xs text-gray-400">
-                      <span>{getWordCount(entry.content)} words</span>
-                      <span className="mx-2">•</span>
-                      <span>{Math.max(1, Math.ceil(getWordCount(entry.content) / 200))} min read</span>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -165,16 +173,14 @@ export function Sidebar({
         )}
       </div>
 
-      <div className="p-4 border-t border-gray-200">
-        <button 
+      <div className="p-3 border-t border-stone-100">
+        <button
           onClick={onNewEntry}
-          className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          className="w-full flex items-center justify-center py-2 bg-stone-900 text-white rounded hover:bg-stone-800 transition-colors text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-2"
           data-testid="button-new-entry"
+          aria-label="Create new entry"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          New Entry
+          New entry
         </button>
       </div>
     </div>

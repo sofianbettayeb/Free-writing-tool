@@ -355,98 +355,112 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
   return (
     <div className="flex flex-col min-h-0 h-full">
       {/* Formatting Toolbar */}
-      <div className="border-b border-gray-200/60 px-4 py-2 bg-gray-50/30">
+      <div className="border-b border-stone-200 px-4 py-2 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1">
             <button
               onClick={toggleBold}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('bold') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('bold') ? 'bg-stone-200' : ''
               }`}
               title="Bold (Ctrl+B)"
+              aria-label="Bold"
+              aria-pressed={editor.isActive('bold')}
               data-testid="button-bold"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
               </svg>
             </button>
             
             <button
               onClick={toggleItalic}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('italic') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('italic') ? 'bg-stone-200' : ''
               }`}
               title="Italic (Ctrl+I)"
+              aria-label="Italic"
+              aria-pressed={editor.isActive('italic')}
               data-testid="button-italic"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
               </svg>
             </button>
 
             <button
               onClick={toggleUnderline}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('underline') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('underline') ? 'bg-stone-200' : ''
               }`}
               title="Underline (Ctrl+U)"
+              aria-label="Underline"
+              aria-pressed={editor.isActive('underline')}
               data-testid="button-underline"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
               </svg>
             </button>
 
             <button
               onClick={toggleStrike}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('strike') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('strike') ? 'bg-stone-200' : ''
               }`}
               title="Strikethrough (Ctrl+Shift+S)"
+              aria-label="Strikethrough"
+              aria-pressed={editor.isActive('strike')}
               data-testid="button-strike"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/>
               </svg>
             </button>
 
             <button
               onClick={toggleCode}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('code') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('code') ? 'bg-stone-200' : ''
               }`}
               title="Code (Ctrl+E)"
+              aria-label="Code"
+              aria-pressed={editor.isActive('code')}
               data-testid="button-code"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
               </svg>
             </button>
 
-            <div className="w-px h-4 bg-gray-300/60 mx-2"></div>
+            <div className="w-px h-4 bg-stone-200 mx-1"></div>
 
             <button
               onClick={toggleBulletList}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('bulletList') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('bulletList') ? 'bg-stone-200' : ''
               }`}
               title="Bullet List"
+              aria-label="Bullet list"
+              aria-pressed={editor.isActive('bulletList')}
               data-testid="button-bullet-list"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
               </svg>
             </button>
 
             <button
               onClick={toggleOrderedList}
-              className={`p-1.5 hover:bg-gray-100 rounded transition-colors ${
-                editor.isActive('orderedList') ? 'bg-gray-200' : ''
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('orderedList') ? 'bg-stone-200' : ''
               }`}
               title="Numbered List"
+              aria-label="Numbered list"
+              aria-pressed={editor.isActive('orderedList')}
               data-testid="button-ordered-list"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                 <circle cx="2" cy="6" r="1" fill="currentColor"></circle>
                 <circle cx="2" cy="10" r="1" fill="currentColor"></circle>
@@ -457,33 +471,36 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
 
             <button
               onClick={insertLink}
-              className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
               title="Insert Link (Ctrl+K)"
+              aria-label="Insert link"
               data-testid="button-link"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
               </svg>
             </button>
 
             <button
               onClick={insertImage}
-              className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
               title="Insert Image"
+              aria-label="Insert image"
               data-testid="button-image"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </button>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <select
               value={selectedFont}
               onChange={(e) => changeFontFamily(e.target.value)}
-              className="text-sm border border-gray-300/60 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-colors"
+              className="text-sm border border-stone-200 rounded px-2 py-1.5 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500"
               data-testid="select-font"
+              aria-label="Font family"
             >
               {FONT_OPTIONS.map(font => (
                 <option key={font.value} value={font.value}>
@@ -492,9 +509,9 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
               ))}
             </select>
 
-            <div className="text-sm text-gray-600 bg-gray-100/70 px-4 py-2 rounded-lg font-medium">
+            <span className="text-sm text-stone-500">
               <span data-testid="text-word-count">{getWordCount()}</span> words
-            </div>
+            </span>
           </div>
         </div>
       </div>
@@ -502,83 +519,72 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
       {/* Editor Area - Fixed Layout */}
       <div className="flex-1 flex flex-col bg-white min-h-0">
         {/* Fixed Title Input */}
-        <div className={`border-b border-gray-100 py-2 flex-shrink-0 ${sidebarOpen ? 'px-4 md:px-8' : 'px-6 md:px-12'}`}>
-          <div className="max-w-4xl mx-auto">
+        <div className={`border-b border-stone-100 py-3 flex-shrink-0 ${sidebarOpen ? 'px-4 md:px-8' : 'px-6 md:px-12'}`}>
+          <div className="max-w-3xl mx-auto">
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
-              placeholder="Entry title..."
-              className="w-full text-2xl font-bold border-none outline-none placeholder-gray-400/80 text-gray-900 leading-tight focus-ring"
+              placeholder="Untitled"
+              className="w-full text-xl font-semibold border-none outline-none placeholder-stone-300 text-stone-900 leading-tight"
               data-testid="input-title"
+              aria-label="Entry title"
             />
           </div>
-          
-          {/* Tags Section - Inline Layout */}
-          <div className="mt-3">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex flex-wrap items-center gap-2">
-              {/* Display existing tags */}
+
+          {/* Tags - simplified inline */}
+          <div className="mt-2">
+            <div className="max-w-3xl mx-auto">
+              <div className="flex flex-wrap items-center gap-1.5">
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200 transition-colors group cursor-pointer"
+                  className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-stone-100 text-stone-600 hover:bg-stone-200 transition-colors"
                   data-testid={`tag-${tag}`}
                 >
-                  <span className="mr-1.5">{tag}</span>
+                  <span className="mr-1">{tag}</span>
                   <button
                     onClick={() => removeTag(tag)}
-                    className="text-blue-600 hover:text-blue-800 font-medium text-lg leading-none"
+                    className="text-stone-400 hover:text-stone-600 font-medium leading-none focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 rounded"
                     data-testid={`button-remove-tag-${tag}`}
+                    aria-label={`Remove tag: ${tag}`}
                   >
                     ×
                   </button>
                 </span>
               ))}
-              
-              {/* Tag input - inline with tags */}
-              <div className="flex items-center min-w-0 flex-1">
-                <input
-                  type="text"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagInputKeyDown}
-                  placeholder="Add tags (press Enter or comma to add)..."
-                  className="flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-3 py-1.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
-                  data-testid="input-tag"
-                />
-                {tagInput.trim() && (
-                  <button
-                    onClick={() => addTag(tagInput)}
-                    className="ml-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors"
-                    data-testid="button-add-tag"
-                  >
-                    Add
-                  </button>
-                )}
-              </div>
+
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagInputKeyDown}
+                placeholder={tags.length === 0 ? "Add tags..." : "+"}
+                className="min-w-[60px] flex-1 text-xs border-none outline-none placeholder-stone-400 text-stone-600 bg-transparent"
+                data-testid="input-tag"
+                aria-label="Add tag"
+              />
             </div>
           </div>
         </div>
         </div>
-        
-        {/* Scrollable Content Area - ONLY SCROLLER */}
-        <div className={`flex-1 min-h-0 overflow-y-auto py-8 ${sidebarOpen ? 'px-4 md:px-8' : 'px-6 md:px-12'}`}>
-          <div className="max-w-4xl mx-auto">
+
+        {/* Content Area */}
+        <div className={`flex-1 min-h-0 overflow-y-auto py-6 ${sidebarOpen ? 'px-4 md:px-8' : 'px-6 md:px-12'}`}>
+          <div className="max-w-3xl mx-auto">
             <EditorContent
               editor={editor}
-              className="w-full prose prose-lg max-w-none focus-within:outline-none"
+              className="w-full prose prose-stone max-w-none focus-within:outline-none"
               style={{
-                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Inter, system-ui, sans-serif',
-                fontSize: '18px',
-                lineHeight: '1.75',
-                color: '#1f2937'
+                fontFamily: FONT_OPTIONS.find(f => f.value === selectedFont)?.family || 'Charter, Georgia, serif',
+                fontSize: '17px',
+                lineHeight: '1.8',
+                color: '#292524'
               }}
               data-testid="editor-content"
             />
           </div>
         </div>
-
       </div>
     </div>
   );

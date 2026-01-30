@@ -287,33 +287,36 @@ export default function Journal() {
 
   return (
     <AuthenticatedLayout>
-      <div className="h-full bg-gradient-to-br from-gray-50 to-blue-50/30 flex flex-col">
-      
+      <div className="h-full bg-stone-50 flex flex-col">
+
       {/* Action Bar */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-white/60 backdrop-blur-sm border-b border-gray-200/60">
+      <div className="flex items-center justify-between px-4 md:px-6 py-2 bg-white border-b border-stone-200">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
                 data-testid="button-open-sidebar-menu"
                 title="Open sidebar"
+                aria-label="Open sidebar"
+                aria-expanded={sidebarOpen}
               >
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
             )}
-            <span data-testid="text-entry-count" className="text-sm text-gray-600">{displayedEntries.length} {displayedEntries.length === 1 ? 'entry' : 'entries'}</span>
+            <span data-testid="text-entry-count" className="text-sm text-stone-600">{displayedEntries.length} {displayedEntries.length === 1 ? 'entry' : 'entries'}</span>
           </div>
           {selectedTag && (
-            <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-              <span className="text-sm text-blue-800">Filtered by: {selectedTag}</span>
+            <div className="flex items-center space-x-2 bg-stone-100 px-3 py-1 rounded border border-stone-200">
+              <span className="text-sm text-stone-700">{selectedTag}</span>
               <button
                 onClick={clearTagFilter}
-                className="text-blue-600 hover:text-blue-800 font-medium text-lg leading-none"
+                className="text-stone-500 hover:text-stone-700 font-medium text-lg leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 rounded"
                 data-testid="button-clear-tag-filter"
+                aria-label={`Clear filter: ${selectedTag}`}
               >
                 ×
               </button>
@@ -327,12 +330,14 @@ export default function Journal() {
             <div className="flex items-center space-x-2">
               {/* Delete Entry Button */}
               {selectedEntry && !showDeleteConfirm && (
-                <button 
+                <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="group flex items-center px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                  className="group flex items-center px-3 py-2 text-sm text-stone-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1"
                   data-testid="button-delete"
+                  aria-label="Delete entry"
+                  title="Delete entry"
                 >
-                  <svg className="w-4 h-4 text-gray-600 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-stone-600 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
                 </button>
@@ -340,19 +345,21 @@ export default function Journal() {
               
               {/* Confirm Delete */}
               {showDeleteConfirm && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">Delete entry?</span>
-                  <button 
+                <div className="flex items-center space-x-2" role="alertdialog" aria-labelledby="delete-confirm-label">
+                  <span id="delete-confirm-label" className="text-sm text-stone-600">Delete entry?</span>
+                  <button
                     onClick={handleDeleteEntry}
-                    className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                    className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1"
                     data-testid="button-confirm-delete"
+                    aria-label="Confirm delete"
                   >
                     Yes
                   </button>
-                  <button 
+                  <button
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                    className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-1"
                     data-testid="button-cancel-delete"
+                    aria-label="Cancel delete"
                   >
                     No
                   </button>
@@ -360,12 +367,14 @@ export default function Journal() {
               )}
               
               {/* Export Button */}
-              <button 
+              <button
                 onClick={() => setShowExportModal(true)}
-                className="group flex items-center px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                className="group flex items-center px-3 py-2 text-sm text-stone-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
                 data-testid="button-export"
+                aria-label="Export entries"
+                title="Export entries"
               >
-                <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-stone-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
               </button>
@@ -398,7 +407,7 @@ export default function Journal() {
               sidebarOpen={sidebarOpen}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className="flex-1 flex items-center justify-center text-stone-500">
               <div className="text-center">
                 <h3 className="text-lg font-medium mb-2">No entry selected</h3>
                 <p>Create a new entry or select an existing one to start writing</p>
@@ -408,28 +417,18 @@ export default function Journal() {
         </div>
       </div>
 
-      {/* Footer Row */}
-      <div className="border-t border-gray-200/60 px-4 md:px-6 py-2 bg-gray-50/20 flex items-center justify-between text-sm text-gray-500">
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>Auto-save enabled</span>
-          </div>
-          <span data-testid="text-character-count" className="text-gray-600">{selectedEntry?.content ? selectedEntry.content.replace(/<[^>]*>/g, '').length : 0} characters</span>
-        </div>
-        <div className="flex items-center space-x-4 text-gray-400">
-          <button
-            onClick={() => setShowShortcuts(true)}
-            className="text-xs hover:text-gray-600 transition-colors flex items-center gap-1"
-            data-testid="button-show-shortcuts"
-          >
-            <span>Press</span>
-            <kbd className="px-1.5 py-0.5 bg-gray-200 rounded text-[10px] font-mono">{navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl'}+/</kbd>
-            <span>for shortcuts</span>
-          </button>
-          <span className="text-gray-300">|</span>
-          <span>Changes save automatically</span>
-        </div>
+      {/* Footer Row - Simplified */}
+      <div className="border-t border-stone-200 px-4 md:px-6 py-2 bg-white flex items-center justify-between text-sm text-stone-500">
+        <span data-testid="text-character-count">{selectedEntry?.content ? selectedEntry.content.replace(/<[^>]*>/g, '').length : 0} chars</span>
+        <button
+          onClick={() => setShowShortcuts(true)}
+          className="text-xs hover:text-stone-700 transition-colors flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 focus-visible:ring-offset-1 rounded px-1"
+          data-testid="button-show-shortcuts"
+          aria-label="Show keyboard shortcuts"
+        >
+          <kbd className="px-1.5 py-0.5 bg-stone-100 rounded text-[10px] font-mono">{navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl'}+/</kbd>
+          <span>shortcuts</span>
+        </button>
       </div>
 
       <ExportModal
@@ -444,7 +443,7 @@ export default function Journal() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
               </svg>
               Keyboard Shortcuts
@@ -460,7 +459,7 @@ export default function Journal() {
                 <div className="flex items-center gap-1">
                   {shortcut.keys.map((key, keyIndex) => (
                     <span key={keyIndex}>
-                      <kbd className="px-2 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-mono text-gray-600">
+                      <kbd className="px-2 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-mono text-stone-600">
                         {key === 'Mod' ? (navigator.platform.includes('Mac') ? '⌘' : 'Ctrl') : key}
                       </kbd>
                       {keyIndex < shortcut.keys.length - 1 && (

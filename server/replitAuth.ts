@@ -8,7 +8,9 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
+const isLocalDev = process.env.LOCAL_DEV === "true";
+
+if (!isLocalDev && !process.env.REPLIT_DOMAINS) {
   throw new Error("Environment variable REPLIT_DOMAINS not provided");
 }
 
@@ -24,6 +26,20 @@ const getOidcConfig = memoize(
 
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+  if (isLocalDev) {
+    return session({
+      secret: "local-dev-secret",
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: false,
+        maxAge: sessionTtl,
+      },
+    });
+  }
+
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
@@ -71,6 +87,46 @@ export async function setupAuth(app: Express) {
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // Local dev mode - simplified auth
+  if (isLocalDev) {
+    const localUser = {
+      claims: {
+        sub: "local-dev-user",
+        email: "dev@localhost",
+        first_name: "Local",
+        last_name: "Developer",
+      },
+      expires_at: Math.floor(Date.now() / 1000) + 86400 * 365, // 1 year
+    };
+
+    // Upsert the local dev user
+    await storage.upsertUser({
+      id: "local-dev-user",
+      email: "dev@localhost",
+      firstName: "Local",
+      lastName: "Developer",
+      profileImageUrl: null,
+    });
+
+    passport.serializeUser((user: Express.User, cb) => cb(null, user));
+    passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+
+    // Auto-login for local dev
+    app.use((req: any, _res, next) => {
+      if (!req.user) {
+        req.user = localUser;
+        req.isAuthenticated = () => true;
+      }
+      next();
+    });
+
+    app.get("/api/login", (_req, res) => res.redirect("/"));
+    app.get("/api/callback", (_req, res) => res.redirect("/"));
+    app.get("/api/logout", (_req, res) => res.redirect("/"));
+
+    return;
+  }
 
   const config = await getOidcConfig();
 
