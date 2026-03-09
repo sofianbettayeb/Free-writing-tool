@@ -41,9 +41,11 @@ Preferred communication style: Simple, everyday language.
 - **Timer**: Pomodoro-style writing timer with notifications
 
 ### Authentication & Security
-- Currently no authentication system implemented
-- Application assumes single-user setup
-- Local storage used for draft persistence
+- Replit OIDC authentication with Passport.js
+- 30-day session duration with PostgreSQL session store
+- Session-based auth: middleware relies on session validity, not OIDC token expiry
+- Silent background token refresh when access tokens expire (non-blocking)
+- Multi-user support with user-scoped entries
 
 ## External Dependencies
 
