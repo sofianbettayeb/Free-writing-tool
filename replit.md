@@ -82,6 +82,7 @@ Preferred communication style: Simple, everyday language.
 - Fixed scrolling issues on landing page with conditional CSS overflow management
 - Dynamic margin system implemented: smaller margins when sidebar open, larger when closed
 - Enhanced copy-paste functionality: supports copying both text and images together for rich content sharing
+- Image-inclusive export: "Copy for LLMs" button embeds images as base64 in markdown, "Embed images" toggle for markdown/HTML downloads creates self-contained files
 - Menu icon integration: Added hamburger menu in action bar to open/close sidebar, removed floating button
 - Comprehensive SEO optimizations: favicon, meta tags, Open Graph, Twitter Cards, structured data, keyword optimization
 - Keyboard shortcuts system: All formatting options accessible via standard shortcuts (Cmd/Ctrl+B for bold, Cmd/Ctrl+I for italic, etc.)

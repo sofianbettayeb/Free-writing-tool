@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { JournalEntry } from '@shared/schema';
-import { exportEntries, exportToChatGPT } from '@/lib/export';
+import { exportEntries, exportForLLM } from '@/lib/export';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExportModalProps {
@@ -18,39 +19,39 @@ interface ExportModalProps {
 export function ExportModal({ isOpen, onClose, entries, selectedEntryId }: ExportModalProps) {
   const [format, setFormat] = useState('markdown');
   const [range, setRange] = useState('current');
+  const [embedImages, setEmbedImages] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();
+
+  const getEntriesToExport = (): JournalEntry[] => {
+    switch (range) {
+      case 'current':
+        if (selectedEntryId) {
+          const entry = entries.find(e => e.id === selectedEntryId);
+          if (entry) return [entry];
+        }
+        return [];
+      case 'today': {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return entries.filter(entry => new Date(entry.createdAt) >= today);
+      }
+      case 'week': {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return entries.filter(entry => new Date(entry.createdAt) >= weekAgo);
+      }
+      case 'all':
+        return entries;
+      default:
+        return [];
+    }
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      let entriesToExport: JournalEntry[] = [];
-
-      switch (range) {
-        case 'current':
-          if (selectedEntryId) {
-            const entry = entries.find(e => e.id === selectedEntryId);
-            if (entry) entriesToExport = [entry];
-          }
-          break;
-        case 'today':
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          entriesToExport = entries.filter(entry => 
-            new Date(entry.createdAt) >= today
-          );
-          break;
-        case 'week':
-          const weekAgo = new Date();
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          entriesToExport = entries.filter(entry => 
-            new Date(entry.createdAt) >= weekAgo
-          );
-          break;
-        case 'all':
-          entriesToExport = entries;
-          break;
-      }
+      const entriesToExport = getEntriesToExport();
 
       if (entriesToExport.length === 0) {
         toast({
@@ -61,11 +62,11 @@ export function ExportModal({ isOpen, onClose, entries, selectedEntryId }: Expor
         return;
       }
 
-      await exportEntries(entriesToExport, format as 'markdown' | 'json' | 'txt' | 'html');
+      await exportEntries(entriesToExport, format as 'markdown' | 'json' | 'txt' | 'html', embedImages);
       
       toast({
         title: 'Export successful',
-        description: `Exported ${entriesToExport.length} entries as ${format.toUpperCase()}`,
+        description: `Exported ${entriesToExport.length} entries as ${format.toUpperCase()}${embedImages ? ' with images' : ''}`,
       });
       
       onClose();
@@ -80,36 +81,10 @@ export function ExportModal({ isOpen, onClose, entries, selectedEntryId }: Expor
     }
   };
 
-  const handleChatGPTExport = async () => {
+  const handleLLMExport = async () => {
     setIsExporting(true);
     try {
-      let entriesToExport: JournalEntry[] = [];
-
-      switch (range) {
-        case 'current':
-          if (selectedEntryId) {
-            const entry = entries.find(e => e.id === selectedEntryId);
-            if (entry) entriesToExport = [entry];
-          }
-          break;
-        case 'today':
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          entriesToExport = entries.filter(entry => 
-            new Date(entry.createdAt) >= today
-          );
-          break;
-        case 'week':
-          const weekAgo = new Date();
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          entriesToExport = entries.filter(entry => 
-            new Date(entry.createdAt) >= weekAgo
-          );
-          break;
-        case 'all':
-          entriesToExport = entries;
-          break;
-      }
+      const entriesToExport = getEntriesToExport();
 
       if (entriesToExport.length === 0) {
         toast({
@@ -120,17 +95,17 @@ export function ExportModal({ isOpen, onClose, entries, selectedEntryId }: Expor
         return;
       }
 
-      exportToChatGPT(entriesToExport);
+      await exportForLLM(entriesToExport);
       
       toast({
         title: 'Copied to clipboard',
-        description: `${entriesToExport.length} entries formatted for ChatGPT and copied to clipboard`,
+        description: `${entriesToExport.length} entries with images formatted for LLMs and copied to clipboard`,
       });
       
       onClose();
     } catch (error) {
       toast({
-        title: 'ChatGPT export failed',
+        title: 'Export failed',
         description: 'Failed to copy content to clipboard.',
         variant: 'destructive',
       });
@@ -138,6 +113,8 @@ export function ExportModal({ isOpen, onClose, entries, selectedEntryId }: Expor
       setIsExporting(false);
     }
   };
+
+  const supportsEmbedImages = format === 'markdown' || format === 'html';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -183,15 +160,29 @@ export function ExportModal({ isOpen, onClose, entries, selectedEntryId }: Expor
               </div>
             </RadioGroup>
           </div>
+
+          {supportsEmbedImages && (
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="embed-images" className="text-sm font-medium text-gray-700">Embed images</Label>
+                <p className="text-xs text-gray-500 mt-0.5">Include images directly in the file (larger file size)</p>
+              </div>
+              <Switch
+                id="embed-images"
+                checked={embedImages}
+                onCheckedChange={setEmbedImages}
+              />
+            </div>
+          )}
           
           <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <Button
               variant="ghost"
-              onClick={handleChatGPTExport}
+              onClick={handleLLMExport}
               disabled={isExporting}
               data-testid="button-chatgpt-export"
             >
-              Export to ChatGPT
+              {isExporting ? 'Copying...' : 'Copy for LLMs'}
             </Button>
             <div className="flex space-x-3">
               <Button variant="ghost" onClick={onClose} data-testid="button-cancel">
