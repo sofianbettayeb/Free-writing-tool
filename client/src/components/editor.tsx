@@ -403,222 +403,96 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
   return (
     <div className="flex flex-col min-h-0 h-full">
       {/* Formatting Toolbar */}
-      <div className="border-b border-stone-200 px-4 py-2 bg-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1 flex-wrap gap-y-1">
-            {/* Heading selector */}
-            <select
-              value={getHeadingLevel()}
-              onChange={(e) => setHeading(Number(e.target.value) as 0 | 1 | 2 | 3)}
-              className="text-sm border border-stone-200 rounded px-2 py-1 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 mr-1"
-              title="Text style"
-              aria-label="Text style"
-            >
-              <option value="0">Paragraph</option>
-              <option value="1">Heading 1</option>
-              <option value="2">Heading 2</option>
-              <option value="3">Heading 3</option>
-            </select>
+      <div className="border-b border-stone-200 bg-white">
+        <div className="flex items-center gap-0.5 px-2 py-1.5 overflow-x-auto">
 
-            <div className="w-px h-4 bg-stone-200 mx-1"></div>
+          {/* Text style */}
+          <select
+            value={getHeadingLevel()}
+            onChange={(e) => setHeading(Number(e.target.value) as 0 | 1 | 2 | 3)}
+            className="text-xs border border-stone-200 rounded px-1.5 py-1 bg-white focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 text-stone-700 shrink-0 w-20"
+            title="Text style"
+            aria-label="Text style"
+          >
+            <option value="0">Normal</option>
+            <option value="1">H1</option>
+            <option value="2">H2</option>
+            <option value="3">H3</option>
+          </select>
 
-            <button
-              onClick={toggleBold}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('bold') ? 'bg-stone-200' : ''
-              }`}
-              title="Bold (Ctrl+B)"
-              aria-label="Bold"
-              aria-pressed={editor.isActive('bold')}
-              data-testid="button-bold"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
-              </svg>
-            </button>
-            
-            <button
-              onClick={toggleItalic}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('italic') ? 'bg-stone-200' : ''
-              }`}
-              title="Italic (Ctrl+I)"
-              aria-label="Italic"
-              aria-pressed={editor.isActive('italic')}
-              data-testid="button-italic"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
-              </svg>
-            </button>
+          <div className="w-px h-5 bg-stone-200 mx-1 shrink-0" />
 
-            <button
-              onClick={toggleUnderline}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('underline') ? 'bg-stone-200' : ''
-              }`}
-              title="Underline (Ctrl+U)"
-              aria-label="Underline"
-              aria-pressed={editor.isActive('underline')}
-              data-testid="button-underline"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
-              </svg>
-            </button>
+          {/* Inline formatting */}
+          <button onClick={toggleBold} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('bold') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Bold (Ctrl+B)" aria-label="Bold" aria-pressed={editor.isActive('bold')} data-testid="button-bold">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+          </button>
 
-            <button
-              onClick={toggleStrike}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('strike') ? 'bg-stone-200' : ''
-              }`}
-              title="Strikethrough (Ctrl+Shift+S)"
-              aria-label="Strikethrough"
-              aria-pressed={editor.isActive('strike')}
-              data-testid="button-strike"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/>
-              </svg>
-            </button>
+          <button onClick={toggleItalic} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('italic') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Italic (Ctrl+I)" aria-label="Italic" aria-pressed={editor.isActive('italic')} data-testid="button-italic">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
+          </button>
 
-            <button
-              onClick={toggleCode}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('code') ? 'bg-stone-200' : ''
-              }`}
-              title="Code (Ctrl+E)"
-              aria-label="Code"
-              aria-pressed={editor.isActive('code')}
-              data-testid="button-code"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-              </svg>
-            </button>
+          <button onClick={toggleUnderline} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('underline') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Underline (Ctrl+U)" aria-label="Underline" aria-pressed={editor.isActive('underline')} data-testid="button-underline">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
+          </button>
 
-            <div className="w-px h-4 bg-stone-200 mx-1"></div>
+          <button onClick={toggleStrike} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('strike') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Strikethrough (Ctrl+Shift+S)" aria-label="Strikethrough" aria-pressed={editor.isActive('strike')} data-testid="button-strike">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>
+          </button>
 
-            <button
-              onClick={toggleBulletList}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('bulletList') ? 'bg-stone-200' : ''
-              }`}
-              title="Bullet List"
-              aria-label="Bullet list"
-              aria-pressed={editor.isActive('bulletList')}
-              data-testid="button-bullet-list"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
-              </svg>
-            </button>
+          <button onClick={toggleCode} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('code') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Inline code (Ctrl+E)" aria-label="Inline code" aria-pressed={editor.isActive('code')} data-testid="button-code">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </button>
 
-            <button
-              onClick={toggleOrderedList}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('orderedList') ? 'bg-stone-200' : ''
-              }`}
-              title="Numbered List"
-              aria-label="Numbered list"
-              aria-pressed={editor.isActive('orderedList')}
-              data-testid="button-ordered-list"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                <circle cx="2" cy="6" r="1" fill="currentColor"></circle>
-                <circle cx="2" cy="10" r="1" fill="currentColor"></circle>
-                <circle cx="2" cy="14" r="1" fill="currentColor"></circle>
-                <circle cx="2" cy="18" r="1" fill="currentColor"></circle>
-              </svg>
-            </button>
+          <div className="w-px h-5 bg-stone-200 mx-1 shrink-0" />
 
-            <button
-              onClick={insertLink}
-              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
-              title="Insert Link (Ctrl+K)"
-              aria-label="Insert link"
-              data-testid="button-link"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-              </svg>
-            </button>
+          {/* Lists */}
+          <button onClick={toggleBulletList} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('bulletList') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Bullet list" aria-label="Bullet list" aria-pressed={editor.isActive('bulletList')} data-testid="button-bullet-list">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          </button>
 
-            <button
-              onClick={insertImage}
-              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
-              title="Insert Image"
-              aria-label="Insert image"
-              data-testid="button-image"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-            </button>
+          <button onClick={toggleOrderedList} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('orderedList') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Numbered list" aria-label="Numbered list" aria-pressed={editor.isActive('orderedList')} data-testid="button-ordered-list">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>
+          </button>
 
-            <div className="w-px h-4 bg-stone-200 mx-1"></div>
+          <div className="w-px h-5 bg-stone-200 mx-1 shrink-0" />
 
-            {/* Blockquote */}
-            <button
-              onClick={toggleBlockquote}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('blockquote') ? 'bg-stone-200' : ''
-              }`}
-              title="Blockquote (Ctrl+Shift+B)"
-              aria-label="Blockquote"
-              aria-pressed={editor.isActive('blockquote')}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-              </svg>
-            </button>
+          {/* Block elements */}
+          <button onClick={toggleBlockquote} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('blockquote') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Blockquote (Ctrl+Shift+B)" aria-label="Blockquote" aria-pressed={editor.isActive('blockquote')}>
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+          </button>
 
-            {/* Code block */}
-            <button
-              onClick={toggleCodeBlock}
-              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
-                editor.isActive('codeBlock') ? 'bg-stone-200' : ''
-              }`}
-              title="Code Block (Ctrl+Alt+C)"
-              aria-label="Code block"
-              aria-pressed={editor.isActive('codeBlock')}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            </button>
+          <button onClick={toggleCodeBlock} className={`p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 ${editor.isActive('codeBlock') ? 'bg-stone-100 text-stone-900' : 'text-stone-500'}`} title="Code block (Ctrl+Alt+C)" aria-label="Code block" aria-pressed={editor.isActive('codeBlock')}>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </button>
 
-            {/* Horizontal rule */}
-            <button
-              onClick={insertHorizontalRule}
-              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
-              title="Horizontal rule"
-              aria-label="Horizontal rule"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 12h16"/>
-              </svg>
-            </button>
+          <button onClick={insertTable} className="p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 text-stone-500" title="Insert table" aria-label="Insert table">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M3 14h18M10 3v18M3 6a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6z"/></svg>
+          </button>
 
-            {/* Table */}
-            <button
-              onClick={insertTable}
-              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
-              title="Insert table"
-              aria-label="Insert table"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M3 14h18M10 3v18M3 6a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6z"/>
-              </svg>
-            </button>
-          </div>
+          <button onClick={insertHorizontalRule} className="p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 text-stone-500" title="Divider line" aria-label="Horizontal rule">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 12h16"/></svg>
+          </button>
 
-          <div className="flex items-center space-x-3">
+          <div className="w-px h-5 bg-stone-200 mx-1 shrink-0" />
+
+          {/* Insert */}
+          <button onClick={insertLink} className="p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 text-stone-500" title="Insert link (Ctrl+K)" aria-label="Insert link" data-testid="button-link">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          </button>
+
+          <button onClick={insertImage} className="p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 shrink-0 text-stone-500" title="Insert image" aria-label="Insert image" data-testid="button-image">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </button>
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Font & word count */}
+          <div className="flex items-center gap-2 shrink-0">
             <select
               value={selectedFont}
               onChange={(e) => changeFontFamily(e.target.value)}
-              className="text-sm border border-stone-200 rounded px-2 py-1.5 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500"
+              className="text-xs border border-stone-200 rounded px-1.5 py-1 bg-white focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 text-stone-600 w-28"
               data-testid="select-font"
               aria-label="Font family"
             >
