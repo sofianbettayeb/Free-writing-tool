@@ -7,8 +7,7 @@ import { setupVite, serveStatic, log } from "./vite";
 const app = express();
 
 // ── Health check ──────────────────────────────────────────────────────────────
-// Registered first, before any other middleware, so it is the fastest possible
-// responder once the server begins accepting connections.
+// Registered synchronously and first so it always responds immediately.
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
@@ -44,13 +43,26 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── Async startup ─────────────────────────────────────────────────────────────
-// OIDC discovery is pre-warmed at module load (see replitAuth.ts) so the
-// await inside setupAuth returns almost immediately, keeping total startup
-// time well within the deployment health-check window.
-(async () => {
-  const server = createServer(app);
+const server = createServer(app);
+const port = parseInt(process.env.PORT || "5000", 10);
 
+// ── Production: serve static files synchronously ──────────────────────────────
+// In production the static middleware is set up synchronously so the root
+// endpoint (/) returns 200 immediately — satisfying the deployment health check
+// as soon as the server starts listening, before any async setup completes.
+if (app.get("env") !== "development") {
+  serveStatic(app);
+}
+
+// Start listening immediately so the health check on / gets a fast response.
+server.listen(port, "0.0.0.0", () => {
+  log(`serving on port ${port}`);
+});
+
+// ── Async setup (auth routes, vite dev server) ────────────────────────────────
+// OIDC discovery is pre-warmed at module load (replitAuth.ts) so this
+// completes quickly. Routes are added to the already-listening server.
+(async () => {
   await registerRoutes(app, server);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -62,14 +74,5 @@ app.use((req, res, next) => {
 
   if (app.get("env") === "development") {
     await setupVite(app, server);
-  } else {
-    serveStatic(app);
   }
-
-  // Listen only after the server is fully configured so health checks
-  // find a ready application rather than a partially initialised one.
-  const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-  });
 })();
