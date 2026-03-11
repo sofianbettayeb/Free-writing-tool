@@ -10,10 +10,6 @@ import { storage } from "./storage";
 
 const isLocalDev = process.env.LOCAL_DEV === "true";
 
-if (!isLocalDev && !process.env.REPLIT_DOMAINS) {
-  throw new Error("Environment variable REPLIT_DOMAINS not provided");
-}
-
 const getOidcConfig = memoize(
   async () => {
     return await client.discovery(
@@ -88,6 +84,11 @@ async function upsertUser(
 }
 
 export async function setupAuth(app: Express) {
+  if (!isLocalDev && !process.env.REPLIT_DOMAINS) {
+    console.error("REPLIT_DOMAINS not set — auth routes will be unavailable");
+    return;
+  }
+
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
