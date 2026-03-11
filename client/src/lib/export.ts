@@ -55,47 +55,47 @@ function htmlToMarkdownWithImages(html: string): string {
   return md.trim();
 }
 
+function buildHtmlExport(entries: JournalEntry[]): string {
+  const body = entries
+    .map((entry) => {
+      const date = format(new Date(entry.createdAt), 'MMMM d, yyyy');
+      return `<article><h1>${entry.title}</h1><p><em>${date}</em></p>${entry.content}</article><hr>`;
+    })
+    .join('\n');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Journal Export</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:2rem}img{max-width:100%;height:auto}</style></head><body>${body}</body></html>`;
+}
+
 export async function exportEntries(
   entries: JournalEntry[],
   exportFormat: 'markdown' | 'json' | 'txt' | 'html',
   embedImages: boolean = false
 ) {
-  if (embedImages && (exportFormat === 'markdown' || exportFormat === 'html')) {
+  const timestamp = format(new Date(), 'yyyy-MM-dd');
+
+  if (exportFormat === 'html') {
+    const processedEntries = embedImages
+      ? await Promise.all(entries.map(async (e) => ({ ...e, content: await embedImagesAsBase64(e.content) })))
+      : entries;
+    const content = buildHtmlExport(processedEntries);
+    downloadAsFile(content, `journal-export-${timestamp}.html`, 'text/html');
+    return;
+  }
+
+  if (embedImages && exportFormat === 'markdown') {
     const processedEntries = await Promise.all(
       entries.map(async (entry) => ({
         ...entry,
         content: await embedImagesAsBase64(entry.content),
       }))
     );
-
-    let content: string;
-    let mimeType: string;
-    let ext: string;
-
-    if (exportFormat === 'html') {
-      content = processedEntries
-        .map((entry) => {
-          const date = format(new Date(entry.createdAt), 'MMMM d, yyyy');
-          return `<article><h1>${entry.title}</h1><p><em>${date}</em></p>${entry.content}</article><hr>`;
-        })
-        .join('\n');
-      content = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Journal Export</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:2rem}img{max-width:100%;height:auto}</style></head><body>${content}</body></html>`;
-      mimeType = 'text/html';
-      ext = 'html';
-    } else {
-      content = processedEntries
-        .map((entry) => {
-          const date = format(new Date(entry.createdAt), 'MMMM d, yyyy');
-          const md = htmlToMarkdownWithImages(entry.content);
-          return `# ${entry.title}\n\n*${date}*\n\n${md}\n\n---\n\n`;
-        })
-        .join('');
-      mimeType = 'text/markdown';
-      ext = 'md';
-    }
-
-    const timestamp = format(new Date(), 'yyyy-MM-dd');
-    downloadAsFile(content, `journal-export-${timestamp}.${ext}`, mimeType);
+    const content = processedEntries
+      .map((entry) => {
+        const date = format(new Date(entry.createdAt), 'MMMM d, yyyy');
+        const md = htmlToMarkdownWithImages(entry.content);
+        return `# ${entry.title}\n\n*${date}*\n\n${md}\n\n---\n\n`;
+      })
+      .join('');
+    downloadAsFile(content, `journal-export-${timestamp}.md`, 'text/markdown');
     return;
   }
 
@@ -119,15 +119,13 @@ export async function exportEntries(
   const link = document.createElement('a');
   link.href = url;
   
-  const timestamp = format(new Date(), 'yyyy-MM-dd');
-  const extensions = {
+  const extensions: Record<string, string> = {
     markdown: 'md',
     json: 'json',
     txt: 'txt',
-    html: 'html',
   };
   
-  link.download = `journal-export-${timestamp}.${extensions[exportFormat]}`;
+  link.download = `journal-export-${timestamp}.${extensions[exportFormat] ?? exportFormat}`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
