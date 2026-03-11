@@ -24,6 +24,11 @@ const getOidcConfig = memoize(
   { maxAge: 3600 * 1000 }
 );
 
+// Pre-warm OIDC discovery at module load so setupAuth's await resolves instantly.
+if (!isLocalDev) {
+  getOidcConfig().catch(() => {});
+}
+
 export function getSession() {
   const sessionTtl = 30 * 24 * 60 * 60 * 1000; // 30 days
 

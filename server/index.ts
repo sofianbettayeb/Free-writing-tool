@@ -7,8 +7,8 @@ import { setupVite, serveStatic, log } from "./vite";
 const app = express();
 
 // ── Health check ──────────────────────────────────────────────────────────────
-// Registered first, synchronously, so it responds immediately during startup
-// before OIDC discovery or any database connection has finished.
+// Registered first, before any other middleware, so it is the fastest possible
+// responder once the server begins accepting connections.
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
@@ -44,19 +44,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── HTTP server ───────────────────────────────────────────────────────────────
-// Start listening immediately so the health check responds during async startup.
-const port = parseInt(process.env.PORT || '5000', 10);
-const server = createServer(app);
-
-server.listen(port, "0.0.0.0", () => {
-  log(`serving on port ${port}`);
-});
-
-// ── Async setup (auth, routes, vite) ─────────────────────────────────────────
-// Runs after the server is already accepting connections, so health checks pass
-// while OIDC discovery and DB connections are being established.
+// ── Async startup ─────────────────────────────────────────────────────────────
+// OIDC discovery is pre-warmed at module load (see replitAuth.ts) so the
+// await inside setupAuth returns almost immediately, keeping total startup
+// time well within the deployment health-check window.
 (async () => {
+  const server = createServer(app);
+
   await registerRoutes(app, server);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -71,4 +65,11 @@ server.listen(port, "0.0.0.0", () => {
   } else {
     serveStatic(app);
   }
+
+  // Listen only after the server is fully configured so health checks
+  // find a ready application rather than a partially initialised one.
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen(port, "0.0.0.0", () => {
+    log(`serving on port ${port}`);
+  });
 })();
