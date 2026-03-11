@@ -1,4 +1,18 @@
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Globe,
+  ShieldCheck,
+  Download,
+  Bold,
+  Italic,
+  Underline,
+  List,
+  Link,
+  Timer,
+  Tags,
+  WifiOff,
+  Pencil,
+} from "lucide-react";
 
 function EditorPreview() {
   return (
@@ -7,32 +21,38 @@ function EditorPreview() {
       style={{ boxShadow: "0 24px 80px -12px rgba(0,0,0,0.12), 0 4px 20px -4px rgba(0,0,0,0.06)" }}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 bg-stone-50 border-b border-stone-200">
-        <span className="text-sm font-light text-stone-600 tracking-tight">Free writing</span>
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between px-5 py-2.5 bg-stone-50 border-b border-stone-200">
+        <div className="flex items-center gap-2">
+          <Pencil className="w-3.5 h-3.5 text-stone-400" />
+          <span className="text-sm font-light text-stone-600 tracking-tight">Free writing</span>
+        </div>
+        <div className="flex items-center gap-3">
           <span className="text-xs text-stone-400">Morning Pages</span>
-          <span className="text-xs text-stone-400 border border-stone-200 rounded px-2 py-0.5">Export</span>
+          <span className="text-xs text-stone-400 border border-stone-200 rounded-md px-2 py-0.5 flex items-center gap-1">
+            <Download className="w-2.5 h-2.5" />
+            Export
+          </span>
         </div>
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-4 py-1.5 bg-white border-b border-stone-100">
-        <span className="text-[11px] text-stone-400 pr-2 border-r border-stone-100 mr-2">Normal</span>
-        {["B", "I", "U"].map(f => (
-          <span key={f} className="text-[11px] text-stone-400 px-1.5 py-0.5 rounded hover:bg-stone-50 cursor-default font-medium">{f}</span>
-        ))}
-        <span className="w-px h-3 bg-stone-100 mx-2" />
-        <span className="text-[11px] text-stone-400 px-1.5 py-0.5">≡</span>
-        <span className="text-[11px] text-stone-400 px-1.5 py-0.5">⇌</span>
+      <div className="flex items-center gap-0.5 px-4 py-1.5 bg-white border-b border-stone-100">
+        <span className="text-[11px] text-stone-400 pr-2 border-r border-stone-100 mr-1.5">Normal</span>
+        <button className="p-1 rounded text-stone-400 hover:bg-stone-50"><Bold className="w-3 h-3" /></button>
+        <button className="p-1 rounded text-stone-400"><Italic className="w-3 h-3" /></button>
+        <button className="p-1 rounded text-stone-400"><Underline className="w-3 h-3" /></button>
+        <span className="w-px h-3 bg-stone-100 mx-1.5" />
+        <button className="p-1 rounded text-stone-400"><List className="w-3 h-3" /></button>
+        <button className="p-1 rounded text-stone-400"><Link className="w-3 h-3" /></button>
         <span className="flex-1" />
         <span className="text-[11px] text-stone-400 italic mr-2">Georgia</span>
         <span className="text-[11px] text-stone-300">312 words</span>
       </div>
 
       {/* Writing area */}
-      <div className="bg-white px-10 pt-10 pb-12" style={{ fontFamily: "Georgia, serif" }}>
+      <div className="bg-white px-10 pt-9 pb-10" style={{ fontFamily: "Georgia, serif" }}>
         <div className="max-w-lg mx-auto">
-          <h2 className="text-2xl font-light text-stone-900 mb-7 tracking-tight" style={{ letterSpacing: "-0.01em" }}>
+          <h2 className="text-2xl font-light text-stone-900 mb-6 tracking-tight" style={{ letterSpacing: "-0.01em" }}>
             Morning Pages
           </h2>
           <p className="text-[15px] text-stone-600 leading-[1.85] mb-5">
@@ -43,21 +63,52 @@ function EditorPreview() {
           <p className="text-[15px] text-stone-500 leading-[1.85]">
             I've been thinking a lot lately about the balance between consumption and creation. It's so easy to
             slip into a reactive state, just absorbing information without synthesizing it.
-            <span className="inline-block w-0.5 h-4 bg-stone-900 ml-0.5 align-middle" style={{ animation: "none" }} />
+            <span className="inline-block w-0.5 h-4 bg-stone-900 ml-0.5 align-middle" />
           </p>
         </div>
       </div>
 
       {/* Status bar */}
-      <div className="flex items-center justify-end px-6 py-2 bg-white border-t border-stone-100">
-        <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-          <span className="text-[11px] text-stone-400">Saved</span>
+      <div className="flex items-center justify-between px-6 py-2 bg-white border-t border-stone-100">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <span className="text-[11px] text-stone-400">Saved</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] text-stone-300">
+          <Timer className="w-2.5 h-2.5" />
+          <span>25:00</span>
         </div>
       </div>
     </div>
   );
 }
+
+const FEATURES = [
+  {
+    icon: Globe,
+    title: "Nothing to install",
+    body: "Runs entirely in your browser. Open a tab and your editor is ready. No apps, no updates, no friction.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Your words, your device",
+    body: "Entries are stored locally by default. Works offline. Enable sync only if you want it.",
+  },
+  {
+    icon: Download,
+    title: "Export anywhere",
+    body: "Download as Markdown, plain text, or HTML. Copy directly to ChatGPT or any AI tool.",
+  },
+];
+
+const TRUST = [
+  { icon: WifiOff, label: "Works offline" },
+  { icon: ShieldCheck, label: "Your data stays private" },
+  { icon: Tags, label: "Tag & organize entries" },
+  { icon: Timer, label: "Focus timer built in" },
+];
 
 export function Landing() {
   return (
@@ -65,12 +116,13 @@ export function Landing() {
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-5 max-w-5xl mx-auto">
-        <span className="text-base font-light text-stone-900 tracking-tight">
-          Free writing
-        </span>
+        <div className="flex items-center gap-2">
+          <Pencil className="w-4 h-4 text-stone-400" strokeWidth={1.5} />
+          <span className="text-base font-light text-stone-900 tracking-tight">Free writing</span>
+        </div>
         <button
           onClick={() => window.location.href = '/api/login'}
-          className="text-sm text-stone-500 hover:text-stone-900 transition-colors flex items-center gap-1"
+          className="text-sm text-stone-500 hover:text-stone-900 transition-colors flex items-center gap-1.5"
         >
           Start writing
           <ArrowRight className="w-3.5 h-3.5" />
@@ -78,12 +130,19 @@ export function Landing() {
       </nav>
 
       {/* Hero */}
-      <main className="max-w-5xl mx-auto px-8 pt-16 pb-20 text-center">
+      <main className="max-w-5xl mx-auto px-8 pt-14 pb-16 text-center">
+
+        {/* SEO eyebrow */}
+        <p className="text-xs font-medium tracking-[0.12em] uppercase text-stone-400 mb-5">
+          Free online writing tool
+        </p>
+
         <h1
-          className="text-5xl lg:text-7xl text-stone-900 leading-[1.05] tracking-tight mb-7"
+          className="text-5xl lg:text-[4.5rem] text-stone-900 leading-[1.05] mb-7"
           style={{ fontWeight: 300, letterSpacing: "-0.025em" }}
         >
-          Writing,<br />without the clutter.
+          Write freely.<br />
+          <span className="text-stone-400">Without the clutter.</span>
         </h1>
 
         <p className="text-lg text-stone-500 leading-relaxed max-w-md mx-auto mb-10">
@@ -100,9 +159,15 @@ export function Landing() {
           <ArrowRight className="w-4 h-4" />
         </button>
 
-        <p className="mt-5 text-sm text-stone-400">
-          Works offline · Your words stay private · Always free
-        </p>
+        {/* Trust badges */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          {TRUST.map(({ icon: Icon, label }) => (
+            <span key={label} className="flex items-center gap-1.5 text-sm text-stone-400">
+              <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
+              {label}
+            </span>
+          ))}
+        </div>
       </main>
 
       {/* Editor preview */}
@@ -110,34 +175,28 @@ export function Landing() {
         <EditorPreview />
       </div>
 
-      {/* 3 values — quiet, centered */}
+      {/* Features */}
       <section className="border-t border-stone-100">
         <div className="max-w-3xl mx-auto px-8 py-20 grid md:grid-cols-3 gap-10">
-          <div>
-            <p className="text-sm font-medium text-stone-900 mb-2">Nothing to install</p>
-            <p className="text-sm text-stone-500 leading-relaxed">
-              Runs entirely in your browser. Open a tab and your editor is ready. No apps, no updates.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-stone-900 mb-2">Your words, your device</p>
-            <p className="text-sm text-stone-500 leading-relaxed">
-              Entries are stored locally by default. Works offline. Enable sync only if you want it.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-stone-900 mb-2">Export anywhere</p>
-            <p className="text-sm text-stone-500 leading-relaxed">
-              Download as Markdown, plain text, or HTML. Copy directly to ChatGPT or any AI tool.
-            </p>
-          </div>
+          {FEATURES.map(({ icon: Icon, title, body }) => (
+            <div key={title}>
+              <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center mb-4">
+                <Icon className="w-4 h-4 text-stone-500" strokeWidth={1.5} />
+              </div>
+              <p className="text-sm font-medium text-stone-900 mb-2">{title}</p>
+              <p className="text-sm text-stone-500 leading-relaxed">{body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Final CTA */}
       <section className="border-t border-stone-100">
         <div className="max-w-5xl mx-auto px-8 py-24 text-center">
-          <p className="text-3xl font-light text-stone-900 mb-8 tracking-tight" style={{ letterSpacing: "-0.015em" }}>
+          <p
+            className="text-3xl font-light text-stone-900 mb-8 tracking-tight"
+            style={{ letterSpacing: "-0.015em" }}
+          >
             Open your browser. Start writing.
           </p>
           <button
@@ -145,7 +204,7 @@ export function Landing() {
             data-testid="button-start-writing-bottom"
             className="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium px-7 py-3.5 rounded-full transition-colors"
           >
-            Open the editor
+            Open the free editor
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -154,7 +213,10 @@ export function Landing() {
       {/* Footer */}
       <footer className="border-t border-stone-100 py-8">
         <div className="max-w-5xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-2">
-          <span className="text-sm text-stone-400 font-light">Free writing</span>
+          <div className="flex items-center gap-2">
+            <Pencil className="w-3.5 h-3.5 text-stone-300" strokeWidth={1.5} />
+            <span className="text-sm text-stone-400 font-light">Free writing</span>
+          </div>
           <span className="text-sm text-stone-400">Free online writing tool · No ads · No tracking</span>
         </div>
       </footer>
