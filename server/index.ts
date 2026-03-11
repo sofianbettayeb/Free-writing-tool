@@ -19,7 +19,7 @@ app.get("/", (req, res, next) => {
   // In production, try to serve the built index.html directly.
   // Fall back to 200 OK so the health check always passes.
   if (app.get("env") !== "development") {
-    const indexPath = path.resolve(import.meta.dirname, "public", "index.html");
+    const indexPath = path.join(process.cwd(), "dist", "public", "index.html");
     if (fs.existsSync(indexPath)) {
       return res.status(200).sendFile(indexPath);
     }
