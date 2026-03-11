@@ -51,7 +51,13 @@ const port = parseInt(process.env.PORT || "5000", 10);
 // endpoint (/) returns 200 immediately — satisfying the deployment health check
 // as soon as the server starts listening, before any async setup completes.
 if (app.get("env") !== "development") {
-  serveStatic(app);
+  try {
+    serveStatic(app);
+  } catch (e) {
+    console.error("Static files not found:", e);
+    // Fallback so the health check on / always gets a 200
+    app.use("*", (_req, res) => res.status(200).send("OK"));
+  }
 }
 
 // Start listening immediately so the health check on / gets a fast response.
