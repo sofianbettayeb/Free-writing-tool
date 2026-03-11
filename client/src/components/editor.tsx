@@ -3,6 +3,10 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableHeader from '@tiptap/extension-table-header';
+import TableCell from '@tiptap/extension-table-cell';
 import { DOMSerializer } from '@tiptap/pm/model';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { JournalEntry, InsertJournalEntry } from '@shared/schema';
@@ -46,6 +50,10 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
         },
         allowBase64: true,
       }),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: entry.content || '',
     onUpdate: ({ editor }) => {
@@ -333,6 +341,37 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
     input.click();
   }, [editor]);
 
+  const setHeading = useCallback((level: 0 | 1 | 2 | 3) => {
+    if (level === 0) {
+      editor?.chain().focus().setParagraph().run();
+    } else {
+      editor?.chain().focus().setHeading({ level }).run();
+    }
+  }, [editor]);
+
+  const toggleBlockquote = useCallback(() => {
+    editor?.chain().focus().toggleBlockquote().run();
+  }, [editor]);
+
+  const toggleCodeBlock = useCallback(() => {
+    editor?.chain().focus().toggleCodeBlock().run();
+  }, [editor]);
+
+  const insertHorizontalRule = useCallback(() => {
+    editor?.chain().focus().setHorizontalRule().run();
+  }, [editor]);
+
+  const insertTable = useCallback(() => {
+    editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+  }, [editor]);
+
+  const getHeadingLevel = (): string => {
+    if (editor?.isActive('heading', { level: 1 })) return '1';
+    if (editor?.isActive('heading', { level: 2 })) return '2';
+    if (editor?.isActive('heading', { level: 3 })) return '3';
+    return '0';
+  };
+
   const changeFontFamily = (fontValue: string) => {
     setSelectedFont(fontValue);
     const font = FONT_OPTIONS.find(f => f.value === fontValue);
@@ -357,7 +396,23 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
       {/* Formatting Toolbar */}
       <div className="border-b border-stone-200 px-4 py-2 bg-white">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 flex-wrap gap-y-1">
+            {/* Heading selector */}
+            <select
+              value={getHeadingLevel()}
+              onChange={(e) => setHeading(Number(e.target.value) as 0 | 1 | 2 | 3)}
+              className="text-sm border border-stone-200 rounded px-2 py-1 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500 mr-1"
+              title="Text style"
+              aria-label="Text style"
+            >
+              <option value="0">Paragraph</option>
+              <option value="1">Heading 1</option>
+              <option value="2">Heading 2</option>
+              <option value="3">Heading 3</option>
+            </select>
+
+            <div className="w-px h-4 bg-stone-200 mx-1"></div>
+
             <button
               onClick={toggleBold}
               className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
@@ -490,6 +545,62 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+
+            <div className="w-px h-4 bg-stone-200 mx-1"></div>
+
+            {/* Blockquote */}
+            <button
+              onClick={toggleBlockquote}
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('blockquote') ? 'bg-stone-200' : ''
+              }`}
+              title="Blockquote"
+              aria-label="Blockquote"
+              aria-pressed={editor.isActive('blockquote')}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+              </svg>
+            </button>
+
+            {/* Code block */}
+            <button
+              onClick={toggleCodeBlock}
+              className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
+                editor.isActive('codeBlock') ? 'bg-stone-200' : ''
+              }`}
+              title="Code block"
+              aria-label="Code block"
+              aria-pressed={editor.isActive('codeBlock')}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </button>
+
+            {/* Horizontal rule */}
+            <button
+              onClick={insertHorizontalRule}
+              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
+              title="Horizontal rule"
+              aria-label="Horizontal rule"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 12h16"/>
+              </svg>
+            </button>
+
+            {/* Table */}
+            <button
+              onClick={insertTable}
+              className="p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1"
+              title="Insert table"
+              aria-label="Insert table"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M3 14h18M10 3v18M3 6a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6z"/>
               </svg>
             </button>
           </div>
