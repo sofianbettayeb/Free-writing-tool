@@ -218,6 +218,15 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
     },
   });
 
+  // Cancel any pending auto-save when the editor unmounts (e.g. entry deleted)
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Update editor content when entry changes (only when switching entries)
   useEffect(() => {
     if (editor && entry.content !== undefined) {

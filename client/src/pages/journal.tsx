@@ -225,7 +225,7 @@ export default function Journal() {
   };
 
   const handleUpdateEntry = (entryData: Partial<InsertJournalEntry>) => {
-    if (selectedEntryId) {
+    if (selectedEntryId && entries.some(e => e.id === selectedEntryId)) {
       updateEntryMutation.mutate({ id: selectedEntryId, data: entryData });
     }
   };
