@@ -556,7 +556,7 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
               className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
                 editor.isActive('blockquote') ? 'bg-stone-200' : ''
               }`}
-              title="Blockquote"
+              title="Blockquote (Ctrl+Shift+B)"
               aria-label="Blockquote"
               aria-pressed={editor.isActive('blockquote')}
             >
@@ -571,7 +571,7 @@ export function Editor({ entry, onUpdate, sidebarOpen = true }: EditorProps) {
               className={`p-2 hover:bg-stone-100 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-1 ${
                 editor.isActive('codeBlock') ? 'bg-stone-200' : ''
               }`}
-              title="Code block"
+              title="Code Block (Ctrl+Alt+C)"
               aria-label="Code block"
               aria-pressed={editor.isActive('codeBlock')}
             >
